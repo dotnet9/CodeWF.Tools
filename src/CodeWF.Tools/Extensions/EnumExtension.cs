@@ -63,35 +63,32 @@ public static class EnumExtension
     }
 
     /// <summary>
-    /// 获取枚举值的Description信息
+    /// 获取枚举值的Description信息，多位域会排除0值
     /// </summary>
     /// <param name ="value">枚举值</param>
     /// <param name ="args">要格式化的对象</param>
     /// <returns>如果未找到DescriptionAttribute则返回null或返回类型描述</returns>
     public static string GetDescription(this Enum value, params object[] args)
     {
-        var type = value.GetType();
-        if (!Enum.IsDefined(type, value))
+        var enumType = value.GetType();
+
+        // 1、检查是否是位域枚举的组合值  
+        var isFlagsEnum = enumType.GetCustomAttribute<FlagsAttribute>() != null;
+
+        // 2、非位域枚举直接返回描述
+        if (!isFlagsEnum) return GetDescriptionPrivate(value, args);
+
+        // 3、位域枚举获取每个标志的描述并用逗号分隔  
+        var descriptions = new List<string>();
+        foreach (Enum enumValue in Enum.GetValues(enumType))
         {
-            return Enum.GetValues(type).OfType<Enum>().Where(value.HasFlag).Select(e =>
-            {
-                var member = type.GetField(e.ToString());
-                var description =
-                    member.GetCustomAttributes(typeof(DescriptionAttribute), false) is DescriptionAttribute[] attrs &&
-                    attrs.Length != 0
-                        ? attrs[0].Description
-                        : e.ToString();
-                return args.Length > 0 ? string.Format(description, args) : description;
-            }).Join(",");
+            // 跳过值为0的枚举成员，因为任何数与0进行“或”运算都不会改变该数的值
+            if (Convert.ToInt64(enumValue) == 0) continue;
+
+            if (value.HasFlag(enumValue)) descriptions.Add(GetDescriptionPrivate(enumValue));
         }
 
-        var member = type.GetField(value.ToString());
-        var description =
-            member.GetCustomAttributes(typeof(DescriptionAttribute), false) is DescriptionAttribute[] attributes &&
-            attributes.Length != 0
-                ? attributes[0].Description
-                : value.ToString();
-        return args.Length > 0 ? string.Format(description, args) : description;
+        return descriptions.Count <= 0 ? GetDescriptionPrivate(value) : string.Join(",", descriptions);
     }
 
     /// <summary>
@@ -197,4 +194,13 @@ public static class EnumExtension
     /// </summary>
     public static Dictionary<string, int> GetDescriptionAndValue(this Type enumType) => Enum.GetValues(enumType)
         .Cast<object>().ToDictionary(e => (e as Enum).GetDescription(), e => (int)e);
+
+    private static string GetDescriptionPrivate(Enum value, params object[] args)
+    {
+        var fieldInfo = value.GetType().GetField(value.ToString());
+        var attribute =
+            Attribute.GetCustomAttribute(fieldInfo!, typeof(DescriptionAttribute)) as DescriptionAttribute;
+        var description = attribute.Description;
+        return args.Length > 0 ? string.Format(description, args) : description;
+    }
 }
