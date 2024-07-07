@@ -26,7 +26,7 @@ public interface ISevenZipCompressor
     /// <param name="rootDir">压缩包内部根文件夹</param>
     /// <param name="archiveType"></param>
     void Zip(IEnumerable<string> files, string zipFile, string rootDir = "", ArchiveType archiveType = ArchiveType.Zip);
-    
+
     /// <summary>
     /// 压缩文件夹
     /// </summary>

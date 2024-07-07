@@ -11,6 +11,14 @@ namespace CodeWF.Tools.Extensions
         private static readonly DateTimeOffset UnixEpochStart = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
         /// <summary>
+        /// 获取该时间相对于1970-01-01T00:00:00Z的秒数，默认使用当前系统时区的偏移量，比如北京时间的TimeSpan.FromHours(8)
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        public static long GetUnixTimeSeconds(this DateTime dt) =>
+            dt.GetUnixTimeSeconds(TimeZoneInfo.Local.BaseUtcOffset);
+
+        /// <summary>
         /// 获取该时间相对于1970-01-01T00:00:00Z的秒数
         /// </summary>
         /// <param name="dt"></param>
@@ -25,6 +33,15 @@ namespace CodeWF.Tools.Extensions
         /// <param name="dt"></param>
         /// <returns></returns>
         public static long GetUnixTimeSeconds(this DateTimeOffset dt) => dt.ToUnixTimeSeconds();
+
+        /// <summary>
+        /// 获取该时间相对于指定年份的精确到0.1秒的特殊时间戳，使用4个字节的整型（uint）以节省空间，startYear需在当前时间10年以内, 默认使用当前系统时区的偏移量，比如北京时间的TimeSpan.FromHours(8)
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="startYear"></param>
+        /// <returns></returns>
+        public static uint GetSpecialUnixTimeSeconds(this DateTime dt, int startYear) =>
+            dt.GetSpecialUnixTimeSeconds(TimeZoneInfo.Local.BaseUtcOffset, startYear);
 
         /// <summary>
         /// 获取该时间相对于指定年份的精确到0.1秒的特殊时间戳，使用4个字节的整型（uint）以节省空间，startYear需在当前时间10年以内
@@ -47,6 +64,13 @@ namespace CodeWF.Tools.Extensions
             (uint)((dt.UtcDateTime.Ticks -
                     new DateTimeOffset(startYear, 1, 1, 0, 0, 0, TimeSpan.Zero).UtcDateTime.Ticks) / 1_000_000L);
 
+        /// <summary>
+        /// 获取该时间相对于1970-01-01T00:00:00Z的毫秒数, 默认使用当前系统时区的偏移量，比如北京时间的TimeSpan.FromHours(8)
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
+        public static long GetUnixTimeMilliseconds(this DateTime dt) =>
+            dt.GetUnixTimeMilliseconds(TimeZoneInfo.Local.BaseUtcOffset);
 
         /// <summary>
         /// 获取该时间相对于1970-01-01T00:00:00Z的毫秒数
@@ -82,6 +106,16 @@ namespace CodeWF.Tools.Extensions
             UnixEpochStart.UtcDateTime.AddSeconds(seconds);
 
         /// <summary>
+        /// 将相对于1970-01-01T00:00:00Z的精确到0.1秒的特殊时间戳转换为DateTime, 默认使用当前系统时区的偏移量，比如北京时间的TimeSpan.FromHours(8)
+        /// </summary>
+        /// <param name="specialSeconds"></param>
+        /// <param name="startYear"></param>
+        /// <returns></returns>
+        public static DateTime FromSpecialUnixTimeSecondsToDateTime(this uint specialSeconds,
+            int startYear) =>
+            specialSeconds.FromSpecialUnixTimeSecondsToDateTime(TimeZoneInfo.Local.BaseUtcOffset, startYear);
+
+        /// <summary>
         /// 将相对于1970-01-01T00:00:00Z的精确到0.1秒的特殊时间戳转换为DateTime
         /// </summary>
         /// <param name="specialSeconds"></param>
@@ -102,6 +136,15 @@ namespace CodeWF.Tools.Extensions
         public static DateTimeOffset
             FromSpecialUnixTimeSecondsToDateTimeOffset(this uint specialSeconds, int startYear) =>
             new DateTimeOffset(startYear, 1, 1, 0, 0, 0, TimeSpan.Zero).AddTicks(specialSeconds * 1_000_000L);
+
+        /// <summary>
+        /// 将相对于1970-01-01T00:00:00Z的毫秒数转换为DateTime
+        /// </summary>
+        /// <param name="milliseconds"></param>
+        /// <param name="offset"></param>
+        /// <returns></returns>
+        public static DateTime FromUnixTimeMillisecondsToDateTime(this long milliseconds) =>
+            milliseconds.FromUnixTimeMillisecondsToDateTime(TimeZoneInfo.Local.BaseUtcOffset);
 
         /// <summary>
         /// 将相对于1970-01-01T00:00:00Z的毫秒数转换为DateTime

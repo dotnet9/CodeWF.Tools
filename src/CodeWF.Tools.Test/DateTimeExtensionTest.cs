@@ -8,7 +8,7 @@ namespace CodeWF.Tools.Test
         private readonly DateTime _testDateTime = new DateTime(2024, 7, 6, 23, 12, 33, DateTimeKind.Local);
 
         private readonly DateTimeOffset _testDateTimeOffset =
-            new DateTimeOffset(2024, 7, 6, 23, 12, 33, TimeSpan.FromHours(8));
+            new DateTimeOffset(2024, 7, 6, 23, 12, 33, TimeZoneInfo.Local.BaseUtcOffset);
 
         private const long ExpectedUnixTimeSeconds = 1720278753;
         private const int StartYear = 2024;
@@ -18,7 +18,7 @@ namespace CodeWF.Tools.Test
         [TestMethod]
         public void Test_GetUnixTimeSeconds_DateTime()
         {
-            var actualResult = _testDateTime.GetUnixTimeSeconds(TimeSpan.FromHours(8));
+            var actualResult = _testDateTime.GetUnixTimeSeconds();
 
             Assert.AreEqual(ExpectedUnixTimeSeconds, actualResult);
         }
@@ -35,7 +35,7 @@ namespace CodeWF.Tools.Test
         [TestMethod]
         public void Test_GetSpecialUnixTimeSeconds_DateTime()
         {
-            var actualResult = _testDateTime.GetSpecialUnixTimeSeconds(TimeSpan.FromHours(8), StartYear);
+            var actualResult = _testDateTime.GetSpecialUnixTimeSeconds(StartYear);
 
             Assert.AreEqual(ExpectedSpecialUnixTimeSeconds, actualResult);
         }
@@ -51,7 +51,7 @@ namespace CodeWF.Tools.Test
         [TestMethod]
         public void Test_GetUnixTimeMilliseconds_DateTime()
         {
-            var actualResult = _testDateTime.GetUnixTimeMilliseconds(TimeSpan.FromHours(8));
+            var actualResult = _testDateTime.GetUnixTimeMilliseconds();
 
             Assert.AreEqual(ExpectedUnixTimeMilliseconds, actualResult);
         }
@@ -86,7 +86,7 @@ namespace CodeWF.Tools.Test
         public void Test_FromSpecialUnixTimeSecondsToDateTime_ValidSeconds()
         {
             var actualResult =
-                ExpectedSpecialUnixTimeSeconds.FromSpecialUnixTimeSecondsToDateTime(TimeSpan.FromHours(8), StartYear);
+                ExpectedSpecialUnixTimeSeconds.FromSpecialUnixTimeSecondsToDateTime(StartYear);
 
             Assert.AreEqual(_testDateTime, actualResult);
         }
@@ -102,7 +102,7 @@ namespace CodeWF.Tools.Test
         [TestMethod]
         public void Test_FromUnixTimeMillisecondsToDateTime_ValidSeconds()
         {
-            var actualResult = ExpectedUnixTimeMilliseconds.FromUnixTimeMillisecondsToDateTime(TimeSpan.FromHours(8));
+            var actualResult = ExpectedUnixTimeMilliseconds.FromUnixTimeMillisecondsToDateTime();
 
             Assert.AreEqual(_testDateTime, actualResult);
         }
