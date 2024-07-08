@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace CodeWF.Tools.Extensions;
@@ -21,5 +22,15 @@ public static class StringExtensions
     {
         DateTime.TryParse(value, out var result);
         return result;
+    }
+
+    /// <summary>
+    /// 使用浏览器打开网址
+    /// </summary>
+    /// <param name="link"></param>
+    public static void OpenBrowserForVisitSite(this string link)
+    {
+        var param = new ProcessStartInfo { FileName = link, UseShellExecute = true, Verb = "open" };
+        Process.Start(param);
     }
 }

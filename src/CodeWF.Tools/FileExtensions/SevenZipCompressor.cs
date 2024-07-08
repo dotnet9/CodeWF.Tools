@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using SharpCompress;
+using SharpCompress.Archives;
+using SharpCompress.Common;
+using SharpCompress.Writers;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using SharpCompress;
-using SharpCompress.Archives;
-using SharpCompress.Common;
-using SharpCompress.Writers;
 
-namespace CodeWF.Tools.FileExt;
+namespace CodeWF.Tools.FileExtensions;
 
 /// <summary>
 /// 7z压缩

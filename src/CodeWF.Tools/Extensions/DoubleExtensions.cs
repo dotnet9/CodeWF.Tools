@@ -1,6 +1,8 @@
-﻿namespace CodeWF.Tools.Hardware;
+﻿using CodeWF.Tools.Models;
 
-public static class SystemInfo
+namespace CodeWF.Tools.Extensions;
+
+public static class DoubleExtensions
 {
     /// <summary>
     /// 根据指定数量的小数位数格式化字节数为易于理解的字符串，同时包含相应的单位

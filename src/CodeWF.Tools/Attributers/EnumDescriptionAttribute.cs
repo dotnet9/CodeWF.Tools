@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace CodeWF.Tools.Reflection;
+namespace CodeWF.Tools.Attributers;
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
 public class EnumDescriptionAttribute : DescriptionAttribute

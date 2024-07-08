@@ -1,10 +1,7 @@
-﻿using System;
+﻿using SharpCompress.Common;
 using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using SharpCompress.Common;
 
-namespace CodeWF.Tools.FileExt;
+namespace CodeWF.Tools.FileExtensions;
 
 /// <summary>
 /// 7z压缩

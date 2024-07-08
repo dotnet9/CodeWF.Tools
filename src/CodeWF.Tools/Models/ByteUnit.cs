@@ -1,4 +1,4 @@
-﻿namespace CodeWF.Tools.Hardware;
+﻿namespace CodeWF.Tools.Models;
 
 /// <summary>
 /// 字节单位枚举

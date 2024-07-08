@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace CodeWF.Tools.Linq;
+namespace CodeWF.Tools.Extensions;
 
 /// <summary>
 /// LINQ扩展方法
@@ -18,7 +18,7 @@ public static class LinqExtension
     /// <returns>新表达式</returns>
     public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> left, Expression<Func<T, bool>> right)
     {
-        return CombineLambdas(left, right, ExpressionType.AndAlso);
+        return left.CombineLambdas(right, ExpressionType.AndAlso);
     }
 
     /// <summary>
@@ -32,7 +32,7 @@ public static class LinqExtension
     public static Expression<Func<T, bool>> AndIf<T>(this Expression<Func<T, bool>> left, bool condition,
         Expression<Func<T, bool>> right)
     {
-        return condition ? CombineLambdas(left, right, ExpressionType.AndAlso) : left;
+        return condition ? left.CombineLambdas(right, ExpressionType.AndAlso) : left;
     }
 
     /// <summary>
@@ -46,7 +46,7 @@ public static class LinqExtension
     public static Expression<Func<T, bool>> AndIf<T>(this Expression<Func<T, bool>> left, Func<bool> condition,
         Expression<Func<T, bool>> right)
     {
-        return condition() ? CombineLambdas(left, right, ExpressionType.AndAlso) : left;
+        return condition() ? left.CombineLambdas(right, ExpressionType.AndAlso) : left;
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public static class LinqExtension
     /// <returns>新表达式</returns>
     public static Expression<Func<T, bool>> Or<T>(this Expression<Func<T, bool>> left, Expression<Func<T, bool>> right)
     {
-        return CombineLambdas(left, right, ExpressionType.OrElse);
+        return left.CombineLambdas(right, ExpressionType.OrElse);
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ public static class LinqExtension
     public static Expression<Func<T, bool>> OrIf<T>(this Expression<Func<T, bool>> left, bool condition,
         Expression<Func<T, bool>> right)
     {
-        return condition ? CombineLambdas(left, right, ExpressionType.OrElse) : left;
+        return condition ? left.CombineLambdas(right, ExpressionType.OrElse) : left;
     }
 
     /// <summary>
@@ -86,7 +86,7 @@ public static class LinqExtension
     public static Expression<Func<T, bool>> OrIf<T>(this Expression<Func<T, bool>> left, Func<bool> condition,
         Expression<Func<T, bool>> right)
     {
-        return condition() ? CombineLambdas(left, right, ExpressionType.OrElse) : left;
+        return condition() ? left.CombineLambdas(right, ExpressionType.OrElse) : left;
     }
 
     private static Expression<Func<T, bool>> CombineLambdas<T>(this Expression<Func<T, bool>> left,

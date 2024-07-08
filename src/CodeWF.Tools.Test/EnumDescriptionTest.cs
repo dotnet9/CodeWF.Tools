@@ -4,7 +4,7 @@ using CodeWF.Tools.Test.Models;
 namespace CodeWF.Tools.Test;
 
 [TestClass]
-public class EnumDescriptionUnitTest
+public class EnumDescriptionTest
 {
     [TestMethod]
     public void Test_GetEnumDescription_Success()
