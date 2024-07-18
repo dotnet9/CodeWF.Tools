@@ -1,8 +1,8 @@
 ﻿using CodeWF.Tools.Extensions;
+using Xunit;
 
 namespace CodeWF.Tools.Test
 {
-    [TestClass]
     public class DateTimeExtensionTest
     {
         private readonly DateTime _testDateTime = new DateTime(2024, 7, 6, 23, 12, 33, DateTimeKind.Local);
@@ -15,104 +15,104 @@ namespace CodeWF.Tools.Test
         private const uint ExpectedSpecialUnixTimeSeconds = 162115530;
         private const long ExpectedUnixTimeMilliseconds = 1720278753000;
 
-        [TestMethod]
+        [Fact]
         public void Test_GetUnixTimeSeconds_DateTime()
         {
             var actualResult = _testDateTime.GetUnixTimeSeconds();
 
-            Assert.AreEqual(ExpectedUnixTimeSeconds, actualResult);
+            Assert.Equal(ExpectedUnixTimeSeconds, actualResult);
         }
 
-        [TestMethod]
+        [Fact]
         public void Test_GetUnixTimeSeconds_DateTimeOffset()
         {
             var actualResult = _testDateTimeOffset.GetUnixTimeSeconds();
 
-            Assert.AreEqual(ExpectedUnixTimeSeconds, actualResult);
+            Assert.Equal(ExpectedUnixTimeSeconds, actualResult);
         }
 
 
-        [TestMethod]
+        [Fact]
         public void Test_GetSpecialUnixTimeSeconds_DateTime()
         {
             var actualResult = _testDateTime.GetSpecialUnixTimeSeconds(StartYear);
 
-            Assert.AreEqual(ExpectedSpecialUnixTimeSeconds, actualResult);
+            Assert.Equal(ExpectedSpecialUnixTimeSeconds, actualResult);
         }
 
-        [TestMethod]
+        [Fact]
         public void Test_GetSpecialUnixTimeSeconds_DateTimeOffset()
         {
             var actualResult = _testDateTimeOffset.GetSpecialUnixTimeSeconds(StartYear);
 
-            Assert.AreEqual(ExpectedSpecialUnixTimeSeconds, actualResult);
+            Assert.Equal(ExpectedSpecialUnixTimeSeconds, actualResult);
         }
 
-        [TestMethod]
+        [Fact]
         public void Test_GetUnixTimeMilliseconds_DateTime()
         {
             var actualResult = _testDateTime.GetUnixTimeMilliseconds();
 
-            Assert.AreEqual(ExpectedUnixTimeMilliseconds, actualResult);
+            Assert.Equal(ExpectedUnixTimeMilliseconds, actualResult);
         }
 
-        [TestMethod]
+        [Fact]
         public void Test_GetUnixTimeMilliseconds_DateTimeOffset()
         {
             var actualResult = _testDateTimeOffset.GetUnixTimeMilliseconds();
 
-            Assert.AreEqual(ExpectedUnixTimeMilliseconds, actualResult);
+            Assert.Equal(ExpectedUnixTimeMilliseconds, actualResult);
         }
 
 
-        [TestMethod]
+        [Fact]
         public void Test_FromUnixTimeSecondsToDateTime_ValidSeconds()
         {
             var actualResult = ExpectedUnixTimeSeconds.FromUnixTimeSecondsToDateTime();
 
-            Assert.AreEqual(_testDateTime, actualResult);
+            Assert.Equal(_testDateTime, actualResult);
         }
 
-        [TestMethod]
+        [Fact]
         public void Test_FromUnixTimeSecondsToDateTimeOffset_ValidSeconds()
         {
             var actualResult = ExpectedUnixTimeSeconds.FromUnixTimeSecondsToDateTimeOffset();
 
-            Assert.AreEqual(_testDateTimeOffset, actualResult);
+            Assert.Equal(_testDateTimeOffset, actualResult);
         }
 
 
-        [TestMethod]
+        [Fact]
         public void Test_FromSpecialUnixTimeSecondsToDateTime_ValidSeconds()
         {
             var actualResult =
                 ExpectedSpecialUnixTimeSeconds.FromSpecialUnixTimeSecondsToDateTime(StartYear);
 
-            Assert.AreEqual(_testDateTime, actualResult);
+            Assert.Equal(_testDateTime, actualResult);
         }
 
-        [TestMethod]
+        [Fact]
         public void Test_FromSpecialUnixTimeSecondsToDateTimeOffset_ValidSeconds()
         {
             var actualResult = ExpectedSpecialUnixTimeSeconds.FromSpecialUnixTimeSecondsToDateTimeOffset(StartYear);
 
-            Assert.AreEqual(_testDateTimeOffset, actualResult);
+            Assert.Equal(_testDateTimeOffset, actualResult);
         }
 
-        [TestMethod]
+        [Fact]
         public void Test_FromUnixTimeMillisecondsToDateTime_ValidSeconds()
         {
             var actualResult = ExpectedUnixTimeMilliseconds.FromUnixTimeMillisecondsToDateTime();
 
-            Assert.AreEqual(_testDateTime, actualResult);
+            Assert.Equal(_testDateTime, actualResult);
         }
 
-        [TestMethod]
+        [Fact]
         public void Test_FromUnixTimeMillisecondsToDateTimeOffset_ValidSeconds()
         {
             var actualResult = ExpectedUnixTimeMilliseconds.FromUnixTimeMillisecondsToDateTimeOffset();
 
-            Assert.AreEqual(_testDateTimeOffset, actualResult);
+            Assert.Equal(_testDateTimeOffset, actualResult);
         }
     }
 }
