@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.ComponentModel;
+using System.Linq;
 
 namespace CodeWF.Tools.Extensions
 {
@@ -55,6 +57,13 @@ namespace CodeWF.Tools.Extensions
         public static T2 Next<T1, T2>(this T1 source, Func<T1, T2> action)
         {
             return action(source);
+        }
+
+        public static string GetDescription<T>()
+        {
+            var type = typeof(T);
+            var descAttr = type.GetCustomAttributes(typeof(DescriptionAttribute), false);
+            return descAttr.Length <= 0 ? nameof(T) : ((DescriptionAttribute)descAttr.First()).Description;
         }
     }
 }
