@@ -60,13 +60,6 @@ public class AppConfigHelper
         return new AppConfigHelper(configFilePath);
     }
 
-
-    public void Set<T>(string name, T value)
-    {
-        _config.AppSettings.Settings[name].Value = value!.ToString();
-        _config.Save(ConfigurationSaveMode.Modified);
-    }
-
     public T Get<T>(string name)
     {
         var value = _config.AppSettings.Settings[name].Value;
@@ -86,5 +79,19 @@ public class AppConfigHelper
             value = default(T);
             return false;
         }
+    }
+
+    public void Set<T>(string name, T value, bool autoSave = true)
+    {
+        _config.AppSettings.Settings[name].Value = value!.ToString();
+        if (autoSave)
+        {
+            _config.Save(ConfigurationSaveMode.Modified);
+        }
+    }
+
+    public void Save()
+    {
+        _config.Save(ConfigurationSaveMode.Modified);
     }
 }
