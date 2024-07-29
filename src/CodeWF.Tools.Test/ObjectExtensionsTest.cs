@@ -1,7 +1,4 @@
-﻿using CodeWF.Tools.Extensions;
-using CodeWF.Tools.Test.Models;
-
-namespace CodeWF.Tools.Test;
+﻿namespace CodeWF.Tools.Test;
 
 public class ObjectExtensionsTest
 {
