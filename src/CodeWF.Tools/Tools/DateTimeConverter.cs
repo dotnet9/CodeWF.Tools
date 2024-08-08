@@ -46,38 +46,29 @@ public class DateTimeConverter
             return false;
         }
 
-        try
-        {
-            return DateTime.UtcNow.ToUniversalTime().ToString("r") == date;
-        }
-        catch
-        {
-            return false;
-        }
+        return DateTime.TryParseExact(date, "ddd, dd MMM yyyy HH:mm:ss 'GMT'", CultureInfo.InvariantCulture, DateTimeStyles.None, out _);
     }
 
     public static string DateToExcelFormat(DateTime date)
     {
-        TimeSpan timeSpan = date.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        TimeSpan timeSpan = date.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0);
         double days = timeSpan.TotalDays;
         return ((days + 25569)).ToString(CultureInfo.InvariantCulture);
     }
 
     public static DateTime ExcelFormatToDate(string excelFormat)
     {
-        if (!double.TryParse(excelFormat, NumberStyles.Float, CultureInfo.InvariantCulture, out double days))
+        if (!double.TryParse(excelFormat, out double days))
         {
             throw new ArgumentException("Invalid Excel format.", nameof(excelFormat));
         }
 
-        double excelDays = days - 25569;
-        TimeSpan timeSpan = TimeSpan.FromDays(excelDays);
-        return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(timeSpan);
+        return new DateTime(1899, 12, 30, 0, 0, 0, DateTimeKind.Utc).AddDays(days);
     }
 
     public static DateTime ExcelFormatToDate(double excelDays)
     {
         TimeSpan timeSpan = TimeSpan.FromDays(excelDays - 25569);
-        return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).Add(timeSpan);
+        return new DateTime(1970, 1, 1, 0, 0, 0).Add(timeSpan);
     }
 }

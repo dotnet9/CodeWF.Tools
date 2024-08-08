@@ -162,4 +162,73 @@ public class DateTimeConverterTest
     }
 
     #endregion
+
+    #region isMongoObjectId
+
+    [Fact(DisplayName = "should return true for valid Mongo ObjectIds")]
+    public void ShouldReturnTrueForValidMongoObjectIds()
+    {
+        Assert.True(DateTimeConverter.IsMongoObjectId("507f1f77bcf86cd799439011"));
+        Assert.True(DateTimeConverter.IsMongoObjectId("507f1f77bcf86cd799439012"));
+    }
+
+    [Fact(DisplayName = "should return false for invalid Mongo ObjectIds")]
+    public void ShouldReturnFalseForInvalidMongoObjectIds()
+    {
+        Assert.False(DateTimeConverter.IsMongoObjectId("507f1f77bcf86cd79943901"));
+        Assert.False(DateTimeConverter.IsMongoObjectId("507f1f77bcf86cd79943901z"));
+        Assert.False(DateTimeConverter.IsMongoObjectId("foo"));
+        Assert.False(DateTimeConverter.IsMongoObjectId(""));
+    }
+
+    #endregion
+
+    #region isExcelFormat
+
+    [Fact(DisplayName = "an Excel format string is a floating number that can be negative")]
+    public void AnExcelFormatStringIsAFloatingNumberThatCanBeNegative()
+    {
+        Assert.True(DateTimeConverter.IsExcelFormat("0"));
+        Assert.True(DateTimeConverter.IsExcelFormat("1"));
+        Assert.True(DateTimeConverter.IsExcelFormat("1.1"));
+        Assert.True(DateTimeConverter.IsExcelFormat("-1.1"));
+        Assert.True(DateTimeConverter.IsExcelFormat("-1"));
+
+
+        Assert.False(DateTimeConverter.IsExcelFormat(""));
+        Assert.False(DateTimeConverter.IsExcelFormat("foo"));
+        Assert.False(DateTimeConverter.IsExcelFormat("1.1.1"));
+
+    }
+
+    #endregion
+
+    #region dateToExcelFormat
+
+    [Fact(DisplayName = "a date in Excel format is the number of days since 01/01/1900")]
+    public void ADateInExcelFormatIsTheNumberOfDaysSince01_01_1900()
+    {
+        Assert.Equal("42510", DateTimeConverter.DateToExcelFormat(DateTime.Parse("2016-05-20T00:00:00.000Z")));
+        Assert.Equal("42510.5", DateTimeConverter.DateToExcelFormat(DateTime.Parse("2016-05-20T12:00:00.000Z")));
+        Assert.Equal("45230.39312987268", DateTimeConverter.DateToExcelFormat(DateTime.Parse("2023-10-31T09:26:06.421Z")));
+        Assert.Equal("25569", DateTimeConverter.DateToExcelFormat(DateTime.Parse("1970-01-01T00:00:00.000Z")));
+        Assert.Equal("-36522", DateTimeConverter.DateToExcelFormat(DateTime.Parse("1800-01-01T00:00:00.000Z")));
+    }
+
+    #endregion
+
+    #region excelFormatToDate
+
+    [Fact(DisplayName = "a date in Excel format is the number of days since 01/01/1900")]
+    public void ExcelFormatToDate()
+    {
+        Assert.Equal(DateTime.Parse("1899-12-30T00:00:00.000Z", null, System.Globalization.DateTimeStyles.RoundtripKind).ToUniversalTime(), DateTimeConverter.ExcelFormatToDate("0"));
+        Assert.Equal(DateTime.Parse("1899-12-31T00:00:00.000Z", null, System.Globalization.DateTimeStyles.RoundtripKind).ToUniversalTime(), DateTimeConverter.ExcelFormatToDate("1"));
+        Assert.Equal(DateTime.Parse("1900-01-01T00:00:00.000Z", null, System.Globalization.DateTimeStyles.RoundtripKind).ToUniversalTime(), DateTimeConverter.ExcelFormatToDate("2"));
+        Assert.Equal(DateTime.Parse("1911-08-12T10:10:50.880Z", null, System.Globalization.DateTimeStyles.RoundtripKind).ToUniversalTime(), DateTimeConverter.ExcelFormatToDate("4242.4242"));
+        Assert.Equal(DateTime.Parse("2017-01-03T05:25:49.607Z", null, System.Globalization.DateTimeStyles.RoundtripKind).ToUniversalTime(), DateTimeConverter.ExcelFormatToDate("42738.22626859954"));
+        Assert.Equal(DateTime.Parse("1897-04-04T00:00:00.000Z", null, System.Globalization.DateTimeStyles.RoundtripKind).ToUniversalTime(), DateTimeConverter.ExcelFormatToDate("-1000"));
+    }
+
+    #endregion
 }
