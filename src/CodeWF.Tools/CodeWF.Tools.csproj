@@ -29,9 +29,9 @@
 		<AssemblyVersion>$(Version)</AssemblyVersion>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="SharpCompress" Version="0.37.2" />
+		<PackageReference Include="SharpCompress" Version="0.38.0" />
 		<PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
-		<PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0-preview.6.24327.7" />
+		<PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0-rc.1.24431.7" />
 	</ItemGroup>
 	<ItemGroup>
 		<!-- The nuget package icon -->
