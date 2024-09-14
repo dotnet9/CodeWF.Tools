@@ -28,6 +28,17 @@ public static class IpHelper
     ///     获取本地所有IP V4地址
     /// </summary>
     /// <returns></returns>
+    public static List<string> GetAllIpV4()
+    {
+        var ipAddresses = Dns.GetHostAddresses(Dns.GetHostName());
+        return ipAddresses.Where(address => address.AddressFamily == AddressFamily.InterNetwork)
+            .Select(address => address.ToString()).ToList();
+    }
+
+    /// <summary>
+    ///     获取本地所有IP V4地址
+    /// </summary>
+    /// <returns></returns>
     public static async Task<List<string>> GetAllIpV4Async()
     {
         var ipAddresses = await Dns.GetHostAddressesAsync(Dns.GetHostName());

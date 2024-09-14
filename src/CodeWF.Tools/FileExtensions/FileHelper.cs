@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Runtime.InteropServices;
 
 namespace CodeWF.Tools.FileExtensions;
 
@@ -26,19 +27,38 @@ public static class FileHelper
 
     public static void OpenFolderAndSelectFile(string fileFullName)
     {
+        var path = fileFullName;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            path = fileFullName.Replace("/", "\\");
+        }
+
         var psi = new System.Diagnostics.ProcessStartInfo("Explorer.exe")
         {
-            Arguments = "/e,/select," + fileFullName
+            Arguments = $"/e,/select,\"{path}\""
         };
         System.Diagnostics.Process.Start(psi);
     }
 
     public static void OpenFolder(string folderFullName)
     {
+        var path = folderFullName;
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            path = folderFullName.Replace("/", "\\");
+        }
+
         var psi = new System.Diagnostics.ProcessStartInfo("Explorer.exe")
         {
             Arguments = folderFullName
         };
         System.Diagnostics.Process.Start(psi);
+    }
+
+    public static void CreateFolderIfNotExist(string folderFullPath)
+    {
+        if (Directory.Exists(folderFullPath)) return;
+
+        Directory.CreateDirectory(folderFullPath);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using CodeWF.Tools.Models;
 
 namespace CodeWF.Tools.Extensions
 {
@@ -114,6 +115,20 @@ namespace CodeWF.Tools.Extensions
         public static DateTime FromSpecialUnixTimeSecondsToDateTime(this uint specialSeconds,
             int startYear) =>
             specialSeconds.FromSpecialUnixTimeSecondsToDateTime(TimeZoneInfo.Local.BaseUtcOffset, startYear);
+
+        public const int StartYear = 2024;
+
+        /// <summary>
+        /// 将毫秒级时间戳转换为DateTime对象，精确到0.1秒
+        /// </summary>
+        /// <param name="milliseconds">要转换的毫秒数</param>
+        /// <param name="startYear">起始年份，默认值为StartYear常量所表示的年份(2024年)</param>
+        /// <returns>返回一个DateTime对象，表示从指定年份开始的时间</returns>
+        public static DateTime ToDateTime(this uint milliseconds, int startYear = StartYear)
+        {
+            var time = new DateTime(startYear, 1, 1, 0, 0, 0, 0);
+            return time.AddMilliseconds((long)milliseconds * 100);
+        }
 
         /// <summary>
         /// 将相对于1970-01-01T00:00:00Z的精确到0.1秒的特殊时间戳转换为DateTime
