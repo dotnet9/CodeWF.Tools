@@ -33,6 +33,7 @@
 		<PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
 		<PackageReference Include="System.Text.Json" Version="9.0.0-rc.1.24431.7" />
 		<PackageReference Include="YamlDotNet" Version="16.1.2" />
+		<PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.0-rc.1.24431.7" />
 	</ItemGroup>
 	<ItemGroup>
 		<!-- The nuget package icon -->
