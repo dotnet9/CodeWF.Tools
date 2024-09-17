@@ -6,6 +6,7 @@ using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace CodeWF.Tools.Extensions;
 
@@ -23,7 +24,8 @@ public static class JsonExtensions
         var options = new JsonSerializerOptions()
         {
             WriteIndented = true,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            TypeInfoResolver = new DefaultJsonTypeInfoResolver()
         };
         try
         {
@@ -50,7 +52,12 @@ public static class JsonExtensions
 
         try
         {
-            obj = JsonSerializer.Deserialize<T>(json);
+            var options = new JsonSerializerOptions()
+            {
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+            };
+            obj = JsonSerializer.Deserialize<T>(json!, options);
             errorMsg = default;
             return true;
         }

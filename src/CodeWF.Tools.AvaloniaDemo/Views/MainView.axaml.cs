@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
+using CodeWF.Tools.Extensions;
 using CodeWF.Tools.Helpers;
 
 namespace CodeWF.Tools.AvaloniaDemo.Views;
@@ -33,5 +34,21 @@ public partial class MainView : UserControl
         }
 
         ReadMainConfig_OnClick(sender, e);
+    }
+
+    private void Json2Yaml_OnClick(object sender, RoutedEventArgs e)
+    {
+        var obj = new { Name = "CodeWF", Year = 5 };
+
+        obj.ToJson(out var jsonString, out var errorMsg);
+        jsonString.JsonToYaml(out var yamlString, out errorMsg);
+    }
+
+    private void Yaml2Json_OnClick(object sender, RoutedEventArgs e)
+    {
+        var obj = new { Name = "CodeWF", Year = 5 };
+
+        obj.ToYaml(out var yamlString, out var errorMsg);
+        yamlString.YamlToJson(out var jsonString, out errorMsg);
     }
 }

@@ -11,10 +11,14 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainViewModel />
     </Design.DataContext>
-    <StackPanel Orientation="Horizontal">
-        <TextBlock Text="主工程: " />
+    <StackPanel>
+        <TextBlock Text="App.config读写: " />
         <Button Content="读取" Click="ReadMainConfig_OnClick" />
         <Button Content="修改" Click="ChangeMainConfig_OnClick" />
-        <TextBlock x:Name="TxtMainThemeConfig"></TextBlock>
+        <TextBlock x:Name="TxtMainThemeConfig" />
+
+        <TextBlock Text="Json与Yaml转换: " />
+        <Button Content="Json转Yaml" Click="Json2Yaml_OnClick" />
+        <Button Content="Yaml转Json" Click="Yaml2Json_OnClick" />
     </StackPanel>
 </UserControl>
