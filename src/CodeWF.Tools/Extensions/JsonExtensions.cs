@@ -1,13 +1,67 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.Globalization;
 using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace CodeWF.Tools.Extensions;
 
 public static class JsonExtensions
 {
+    public static bool ToJson<T>(this T obj, out string? json, out string? errorMsg)
+    {
+        if (obj == null)
+        {
+            json = default;
+            errorMsg = "Please provide object";
+            return false;
+        }
+
+        var options = new JsonSerializerOptions()
+        {
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        };
+        try
+        {
+            json = JsonSerializer.Serialize(obj, options);
+            errorMsg = default;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            json = default;
+            errorMsg = ex.Message;
+            return false;
+        }
+    }
+
+    public static bool FromJson<T>(this string? json, out T? obj, out string? errorMsg)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            obj = default;
+            errorMsg = "Please provide json string";
+            return false;
+        }
+
+        try
+        {
+            obj = JsonSerializer.Deserialize<T>(json);
+            errorMsg = default;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            obj = default;
+            errorMsg = ex.Message;
+            return false;
+        }
+    }
+
     public static bool JsonPrettify(this string? rawJsonString, int indent, bool sortKeys, out string? newJsonString,
         out string? errorMsg)
     {
@@ -44,6 +98,36 @@ public static class JsonExtensions
         catch (Exception ex)
         {
             newJsonString = default;
+            errorMsg = ex.Message;
+            return false;
+        }
+    }
+
+    public static bool JsonToYaml(this string? jsonString, out string? yamlString, out string? errorMsg)
+    {
+        if (string.IsNullOrWhiteSpace(jsonString))
+        {
+            yamlString = default;
+            errorMsg = "Please provide Json string";
+            return false;
+        }
+
+        try
+        {
+            if (jsonString.FromJson(out ExpandoObject newObj, out errorMsg)
+                && newObj.ToYaml(out yamlString, out errorMsg))
+            {
+                return true;
+            }
+            else
+            {
+                yamlString = default;
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            yamlString = default;
             errorMsg = ex.Message;
             return false;
         }
