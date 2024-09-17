@@ -7,6 +7,7 @@ using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using YamlDotNet.System.Text.Json;
 
 namespace CodeWF.Tools.Extensions;
 
@@ -121,16 +122,14 @@ public static class JsonExtensions
 
         try
         {
-            if (jsonString.FromJson(out ExpandoObject newObj, out errorMsg)
-                && newObj.ToYaml(out yamlString, out errorMsg))
+            var options = new JsonSerializerOptions()
             {
-                return true;
-            }
-            else
-            {
-                yamlString = default;
-                return false;
-            }
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+            };
+            yamlString = YamlConverter.SerializeJson(jsonString!, jsonSerializerOptions: options);
+            errorMsg = default;
+            return true;
         }
         catch (Exception ex)
         {

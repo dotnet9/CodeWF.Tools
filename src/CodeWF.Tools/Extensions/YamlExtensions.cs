@@ -18,7 +18,6 @@ public static class YamlExtensions
         try
         {
             var serializer = new SerializerBuilder()
-                .WithNamingConvention(CamelCaseNamingConvention.Instance)
                 .WithIndentedSequences()
                 .Build();
 
@@ -46,7 +45,6 @@ public static class YamlExtensions
         try
         {
             var deserializer = new DeserializerBuilder()
-                .WithNamingConvention(UnderscoredNamingConvention.Instance)
                 .Build();
             ;
 
