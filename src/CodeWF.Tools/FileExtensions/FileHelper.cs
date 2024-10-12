@@ -50,7 +50,7 @@ public static class FileHelper
 
         var psi = new System.Diagnostics.ProcessStartInfo("Explorer.exe")
         {
-            Arguments = folderFullName
+            Arguments = path
         };
         System.Diagnostics.Process.Start(psi);
     }
