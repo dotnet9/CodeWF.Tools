@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Bogus;
+﻿using Bogus;
+using System.Collections.Generic;
 
 namespace CodeWF.Tools.AvaloniaDemo.Models;
 
