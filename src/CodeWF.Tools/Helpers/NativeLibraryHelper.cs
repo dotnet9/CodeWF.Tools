@@ -56,7 +56,7 @@ public static class NativeLibraryHelper
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
             var bitField = Environment.Is64BitProcess ? x64Suffix : x86Suffix;
-            dllPath = Path.Combine(dllDir, dllNamePrefix, $"{bitField}.dll");
+            dllPath = Path.Combine(dllDir, $"{dllNamePrefix}{bitField}.dll");
             return true;
         }
         else
