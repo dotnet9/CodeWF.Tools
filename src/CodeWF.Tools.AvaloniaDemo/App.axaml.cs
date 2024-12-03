@@ -1,4 +1,5 @@
-﻿using Avalonia;
+﻿using System.Reflection;
+using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 
@@ -9,6 +10,7 @@ namespace CodeWF.Tools.AvaloniaDemo;
 
 public partial class App : Application
 {
+    public static Assembly? ExecutingAssembly;
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
