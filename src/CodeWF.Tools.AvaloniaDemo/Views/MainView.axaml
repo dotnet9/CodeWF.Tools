@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:CodeWF.Tools.AvaloniaDemo.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="650"
              x:Class="CodeWF.Tools.AvaloniaDemo.Views.MainView"
              x:DataType="vm:MainViewModel">
     <Design.DataContext>
@@ -11,14 +11,23 @@
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainViewModel />
     </Design.DataContext>
-    <StackPanel>
-        <TextBlock Text="App.config读写: " />
-        <Button Content="读取" Click="ReadMainConfig_OnClick" />
-        <Button Content="修改" Click="ChangeMainConfig_OnClick" />
-        <TextBlock x:Name="TxtMainThemeConfig" />
+    <TabControl TabStripPlacement="Left">
+        <TabItem Header="App.config读写">
+            <StackPanel>
+                <Button Content="读取" Click="ReadMainConfig_OnClick" />
+                <Button Content="修改" Click="ChangeMainConfig_OnClick" />
+                <TextBlock x:Name="TxtMainThemeConfig" />
+            </StackPanel>
+        </TabItem>
+        <TabItem Header="Json与Yaml转换">
+            <StackPanel>
 
-        <TextBlock Text="Json与Yaml转换: " />
-        <Button Content="Json转Yaml" Click="Json2Yaml_OnClick" />
-        <Button Content="Yaml转Json" Click="Yaml2Json_OnClick" />
-    </StackPanel>
+                <Button Content="Json转Yaml" Click="Json2Yaml_OnClick" />
+                <Button Content="Yaml转Json" Click="Yaml2Json_OnClick" />
+            </StackPanel>
+        </TabItem>
+        <TabItem Header="应用程序信息">
+            <TextBlock Text="{Binding AssemblyInfo}" />
+        </TabItem>
+    </TabControl>
 </UserControl>
