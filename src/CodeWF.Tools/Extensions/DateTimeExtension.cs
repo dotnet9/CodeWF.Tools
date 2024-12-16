@@ -41,8 +41,10 @@ namespace CodeWF.Tools.Extensions
         /// <param name="dt"></param>
         /// <param name="startYear"></param>
         /// <returns></returns>
-        public static uint GetSpecialUnixTimeSeconds(this DateTime dt, int startYear) =>
-            dt.GetSpecialUnixTimeSeconds(TimeZoneInfo.Local.BaseUtcOffset, startYear);
+        public static uint GetSpecialUnixTimeSeconds(this DateTime dt, int startYear)
+        {
+            return dt.GetSpecialUnixTimeSeconds(dt.Kind == DateTimeKind.Utc ? TimeSpan.Zero : TimeZoneInfo.Local.BaseUtcOffset, startYear);
+        }
 
         /// <summary>
         /// 获取该时间相对于指定年份的精确到0.1秒的特殊时间戳，使用4个字节的整型（uint）以节省空间，startYear需在当前时间10年以内
