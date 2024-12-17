@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using CodeWF.Tools.Extensions;
+﻿using CodeWF.Tools.Extensions;
+using AssemblyExtensions = CodeWF.Tools.Extensions.AssemblyExtensions;
 
 namespace CodeWF.Tools.AvaloniaDemo.ViewModels;
 
