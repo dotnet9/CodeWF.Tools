@@ -18,7 +18,7 @@ public static class DataTableExtensions
             return dataTable.ExportToCsv(saveFilePath, out errorMsg, containColumnHeader);
         }
 
-        if (saveFilePath.ToLower().EndsWith("*.xlsx"))
+        if (saveFilePath.ToLower().EndsWith(".xlsx"))
         {
             return dataTable.ExportToXlsx(saveFilePath, out errorMsg, containColumnHeader);
         }
