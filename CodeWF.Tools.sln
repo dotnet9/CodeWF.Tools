@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "解决方案项", "解决�
 		logo.png = logo.png
 		README-zh_CN.md = README-zh_CN.md
 		README.md = README.md
+		UpdateLog.md = UpdateLog.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeWF.Tools", "src\CodeWF.Tools\CodeWF.Tools.csproj", "{915B121A-8358-4B8F-9D51-FBB75C5F42A7}"

@@ -36,6 +36,7 @@
 		<PackageReference Include="YamlDotNet.System.Text.Json" Version="1.6.5" />
 		<PackageReference Include="CsvHelper" Version="33.0.1" />
 		<PackageReference Include="MiniExcel" Version="1.36.0" />
+		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.2.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<!-- The nuget package icon -->
