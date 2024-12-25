@@ -66,12 +66,12 @@ public static class DataTableExtensions
     }
 
     public static bool ExportToXlsx(this DataTable dataTable, string saveFilePath, out string errorMsg,
-        bool containColumnHeader = true)
+        bool containColumnHeader = true, bool overwriteFile = true)
     {
         errorMsg = "";
         try
         {
-            MiniExcel.SaveAs(saveFilePath, dataTable);
+            MiniExcel.SaveAs(saveFilePath, dataTable, overwriteFile: overwriteFile);
             return true;
         }
         catch (Exception ex)
