@@ -21,10 +21,9 @@ public static class ImageHelper
         await collection.WriteAsync(destIconPath);
     }
 
-    public static async Task SeparateGenerateIcon(string sourceImagePath, string destIconPath, uint[] sizes)
+    public static async Task SeparateGenerateIcon(string sourceImagePath, string destIconFolder, uint[] sizes)
     {
-        var folder = Path.GetDirectoryName(destIconPath);
-        var fileName = Path.GetFileNameWithoutExtension(destIconPath);
+        var fileName = Path.GetFileNameWithoutExtension(sourceImagePath);
 
         var baseImage = new MagickImage(sourceImagePath);
 
@@ -33,7 +32,7 @@ public static class ImageHelper
             var resizedImage = baseImage.Clone();
             resizedImage.Resize(size, size);
 
-            var savePath = Path.Combine(folder, $"{fileName}.{size}x{size}.ico");
+            var savePath = Path.Combine(destIconFolder, $"{fileName}-{size}x{size}.ico");
             await resizedImage.WriteAsync(savePath);
         }
     }

@@ -8,36 +8,35 @@ public class ImageHelperTest
     [Fact]
     public async Task Test_MergeGenerateIcon_Success()
     {
-        GetImageInfo(out var sourceImage, out var destImage);
-        await ImageHelper.MergeGenerateIcon(sourceImage, destImage, [24, 32]);
+        var sourceImage = "../../logo.png";
+        Assert.True(File.Exists(sourceImage));
 
-        Assert.True(File.Exists(destImage));
+        var destIconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logo.ico");
+        Assert.False(File.Exists(destIconPath));
 
-        FileHelper.DeleteFileIfExist(destImage);
+        await ImageHelper.MergeGenerateIcon(sourceImage, destIconPath, [24, 32]);
+
+        Assert.True(File.Exists(destIconPath));
+
+        FileHelper.DeleteFileIfExist(destIconPath);
     }
 
     [Fact]
     public async Task Test_SeparateGenerateIcon_Success()
     {
-        GetImageInfo(out var sourceImage, out var destImage);
-        await ImageHelper.SeparateGenerateIcon(sourceImage, destImage, [24, 32]);
+        var sourceImage = "../../logo.png";
+        Assert.True(File.Exists(sourceImage));
 
-        var destDir = Path.GetDirectoryName(destImage);
-        var iconFiles = Directory.GetFiles(destDir, "*.ico");
+        var destIconFolder = AppDomain.CurrentDomain.BaseDirectory;
+
+        await ImageHelper.SeparateGenerateIcon(sourceImage, destIconFolder, [24, 32]);
+
+        var iconFiles = Directory.GetFiles(destIconFolder, "*.ico");
         Assert.True(iconFiles.Length > 0);
 
         foreach (var iconFile in iconFiles)
         {
             FileHelper.DeleteFileIfExist(iconFile);
         }
-    }
-
-    private void GetImageInfo(out string sourceImage, out string destImage)
-    {
-        sourceImage = "../../logo.png";
-        Assert.True(File.Exists(sourceImage));
-
-        destImage = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logo.ico");
-        Assert.False(File.Exists(destImage));
     }
 }
