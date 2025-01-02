@@ -2,7 +2,8 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace CodeWF.Tools.Helpers;
+// ReSharper disable once CheckNamespace
+namespace CodeWF.Tools;
 
 public static class ImageHelper
 {
