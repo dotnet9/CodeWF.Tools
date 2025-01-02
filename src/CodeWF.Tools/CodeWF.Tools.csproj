@@ -6,7 +6,7 @@
 		<ApplicationIcon>..\..\logo.ico</ApplicationIcon>
 		<Company>https://codewf.com</Company>
 		<Copyright>https://codewf.com</Copyright>
-		<Description>收集、分享常用工具类</Description>
+		<Description>集成前面的包，功能最全</Description>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<IsPackable>true</IsPackable>
 		<LangVersion>latest</LangVersion>

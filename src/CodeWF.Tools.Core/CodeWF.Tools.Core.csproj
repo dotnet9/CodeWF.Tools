@@ -6,7 +6,7 @@
 		<ApplicationIcon>..\..\logo.ico</ApplicationIcon>
 		<Company>https://codewf.com</Company>
 		<Copyright>https://codewf.com</Copyright>
-		<Description>收集、分享常用工具类</Description>
+		<Description>.NET原生功能扩展，无第三方库依赖</Description>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<IsPackable>true</IsPackable>
 		<LangVersion>latest</LangVersion>
