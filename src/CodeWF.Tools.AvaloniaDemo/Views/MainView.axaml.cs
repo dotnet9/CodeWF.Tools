@@ -1,4 +1,6 @@
-﻿using Avalonia.Controls;
+﻿using System;
+using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
 using CodeWF.Tools.AvaloniaDemo.Models;
@@ -21,6 +23,14 @@ public partial class MainView : UserControl
     private void ReadMainConfig_OnClick(object sender, RoutedEventArgs e)
     {
         _txtMainThemeConfig!.Text = AppConfigHelper.TryGet<string>(ThemeKey, out var theme) ? theme : "No config";
+    }
+
+    private void ReadSpecialConfig_OnClick(object sender, RoutedEventArgs e)
+    {
+        var config = AppConfigHelper.OpenConfig(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+            "CodeWF.Tools.AvaloniaDemo.config"));
+        config.TryGet("Theme", out string? theme);
+        _txtMainThemeConfig!.Text = theme;
     }
 
     private void ChangeMainConfig_OnClick(object sender, RoutedEventArgs e)

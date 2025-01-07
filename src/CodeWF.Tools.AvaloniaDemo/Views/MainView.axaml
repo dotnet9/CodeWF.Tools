@@ -14,6 +14,7 @@
     <TabControl TabStripPlacement="Left">
         <TabItem Header="App.config读写">
             <StackPanel>
+                <Button Content="读取指定配置" Click="ReadSpecialConfig_OnClick" />
                 <Button Content="读取" Click="ReadMainConfig_OnClick" />
                 <Button Content="修改" Click="ChangeMainConfig_OnClick" />
                 <TextBlock x:Name="TxtMainThemeConfig" />

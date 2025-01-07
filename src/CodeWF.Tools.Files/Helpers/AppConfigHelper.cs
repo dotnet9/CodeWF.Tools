@@ -3,11 +3,20 @@
 using System;
 using System.Configuration;
 
-public class AppConfigHelper
+public static class AppConfigHelper
 {
-    public static bool TryGet<T>(string name, out T? value)
+    public static Configuration OpenConfig(string filePath)
     {
-        var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+        var fileMap = new ExeConfigurationFileMap
+        {
+            ExeConfigFilename = filePath
+        };
+        var config = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
+        return config;
+    }
+
+    public static bool TryGet<T>(this Configuration config, string name, out T? value)
+    {
         var result = config.AppSettings.Settings[name].Value;
         try
         {
@@ -29,10 +38,22 @@ public class AppConfigHelper
         }
     }
 
+
+    public static bool TryGet<T>(string name, out T? value)
+    {
+        var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+        return config.TryGet(name, out value);
+    }
+
+    public static void Set<T>(this Configuration config, string name, T value)
+    {
+        config.AppSettings.Settings[name].Value = value?.ToString();
+        config.Save(ConfigurationSaveMode.Modified);
+    }
+
     public static void Set<T>(string name, T value)
     {
         var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-        config.AppSettings.Settings[name].Value = value?.ToString();
-        config.Save(ConfigurationSaveMode.Modified);
+        config.Set(name, value);
     }
 }
