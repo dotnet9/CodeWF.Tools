@@ -21,6 +21,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\CodeWF.Tools.Files\CodeWF.Tools.Files.csproj" />
 		<ProjectReference Include="..\CodeWF.Tools\CodeWF.Tools.csproj" />
 	</ItemGroup>
 
