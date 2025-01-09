@@ -29,7 +29,7 @@
 		<AssemblyVersion>$(Version)</AssemblyVersion>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.2.0" />
+		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.4.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<!-- The nuget package icon -->
