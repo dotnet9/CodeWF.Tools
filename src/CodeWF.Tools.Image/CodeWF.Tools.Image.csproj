@@ -27,6 +27,7 @@
 		<Version>$(Version)</Version>
 		<FileVersion>$(Version)</FileVersion>
 		<AssemblyVersion>$(Version)</AssemblyVersion>
+		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.4.0" />

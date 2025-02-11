@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Interactivity;
@@ -61,5 +62,34 @@ public partial class MainView : UserControl
 
         obj.ToYaml(out var yamlString, out var errorMsg);
         yamlString.YamlToJson(out var jsonString, out errorMsg);
+    }
+
+    private void SerialNormalClass_OnClick(object? sender, RoutedEventArgs e)
+    {
+        List<Project> data = new()
+        {
+            new Project() { Id = "1", Name = "n1", Record = 1 },
+            new Project() { Id = "1", Name = "n1", Record = 1 },
+            new Project() { Id = "1", Name = "n1", Record = 1 }
+        };
+        data.ToJson(out var json, out var errorMsg);
+        TxtJsonStr.Text = json;
+    }
+
+    private void SerialClassWithEnum_OnClick(object? sender, RoutedEventArgs e)
+    {
+        List<ClassWithEnum> data = new()
+        {
+            new ClassWithEnum() { Id = 1, Name = "N1", Type = TestEnum.Dark },
+            new ClassWithEnum() { Id = 1, Name = "N1", Type = TestEnum.Light }
+        };
+        if (data.ToJson(out var json, out var errorMsg))
+        {
+            TxtJsonStr.Text = json;
+        }
+        else
+        {
+            TxtJsonStr.Text = $"序列化异常：{errorMsg}";
+        }
     }
 }

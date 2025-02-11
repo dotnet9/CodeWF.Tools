@@ -1,7 +1,10 @@
-﻿namespace CodeWF.Tools.Test.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace CodeWF.Tools.Test.Models;
 
 public class Student
 {
+    [JsonPropertyName("_Name")]
     public string? Name { get; set; }
     public int Year { get; set; }
 

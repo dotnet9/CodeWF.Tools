@@ -30,5 +30,12 @@
         <TabItem Header="应用程序信息">
             <TextBlock Text="{Binding AssemblyInfo}" />
         </TabItem>
+        <TabItem Header="测试Json序列化">
+            <StackPanel>
+                <Button Content="一般类" Click="SerialNormalClass_OnClick" />
+                <Button Content="枚举类" Click="SerialClassWithEnum_OnClick" />
+                <SelectableTextBlock Name="TxtJsonStr"></SelectableTextBlock>
+            </StackPanel>
+        </TabItem>
     </TabControl>
 </UserControl>
