@@ -1,5 +1,4 @@
-﻿using SharpCompress;
-using SharpCompress.Archives;
+﻿using SharpCompress.Archives;
 using SharpCompress.Common;
 using SharpCompress.Writers;
 using System;
@@ -108,7 +107,7 @@ public class SevenZipCompressor : ISevenZipCompressor
             }
         }
 
-        files.Where(s => !s.StartsWith("http")).ForEach(s =>
+        files.Where(s => !s.StartsWith("http")).ToList().ForEach(s =>
         {
             if (Directory.Exists(s))
             {

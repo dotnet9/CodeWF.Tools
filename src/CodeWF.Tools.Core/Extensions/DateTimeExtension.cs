@@ -67,6 +67,40 @@ namespace CodeWF.Tools.Extensions
             (uint)((dt.UtcDateTime.Ticks -
                     new DateTimeOffset(startYear, 1, 1, 0, 0, 0, TimeSpan.Zero).UtcDateTime.Ticks) / 1_000_000L);
 
+
+
+        /// <summary>
+        /// 获取该时间相对于指定年份的精确到毫秒的特殊时间戳, 默认使用当前系统时区的偏移量，比如北京时间的TimeSpan.FromHours(8)
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="startYear"></param>
+        /// <returns></returns>
+        public static ulong GetSpecialUnixTimeMilliseconds(this DateTime dt, int startYear)
+        {
+            return dt.GetSpecialUnixTimeMilliseconds(dt.Kind == DateTimeKind.Utc ? TimeSpan.Zero : TimeZoneInfo.Local.BaseUtcOffset, startYear);
+        }
+
+        /// <summary>
+        /// 获取该时间相对于指定年份的精确到毫秒的特殊时间戳
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="offset"></param>
+        /// <param name="startYear"></param>
+        /// <returns></returns>
+        public static ulong GetSpecialUnixTimeMilliseconds(this DateTime dt, TimeSpan offset, int startYear) =>
+            (uint)((new DateTimeOffset(dt, offset).UtcDateTime.Ticks -
+                    new DateTimeOffset(startYear, 1, 1, 0, 0, 0, TimeSpan.Zero).UtcDateTime.Ticks) / 10_000L);
+
+        /// <summary>
+        /// 获取该时间相对于指定年份的精确到毫秒的特殊时间戳
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <param name="startYear"></param>
+        /// <returns></returns>
+        public static ulong GetSpecialUnixTimeMilliseconds(this DateTimeOffset dt, int startYear) =>
+            (uint)((dt.UtcDateTime.Ticks -
+                    new DateTimeOffset(startYear, 1, 1, 0, 0, 0, TimeSpan.Zero).UtcDateTime.Ticks) / 10_000L);
+
         /// <summary>
         /// 获取该时间相对于1970-01-01T00:00:00Z的毫秒数, 默认使用当前系统时区的偏移量，比如北京时间的TimeSpan.FromHours(8)
         /// </summary>
