@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using CodeWF.Tools.Models;
 
 namespace CodeWF.Tools.Extensions
 {
@@ -10,6 +9,12 @@ namespace CodeWF.Tools.Extensions
     public static class DateTimeExtension
     {
         private static readonly DateTimeOffset UnixEpochStart = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
+        // 1天的毫秒数
+        private const long MillisecondsPerDay = 24 * 60 * 60 * 1000;
+
+        // uint能表示的最大天数
+        private const double MaxDaysForUint = uint.MaxValue / (double)MillisecondsPerDay;
 
         /// <summary>
         /// 获取该时间相对于1970-01-01T00:00:00Z的秒数，默认使用当前系统时区的偏移量，比如北京时间的TimeSpan.FromHours(8)
@@ -43,7 +48,8 @@ namespace CodeWF.Tools.Extensions
         /// <returns></returns>
         public static uint GetSpecialUnixTimeSeconds(this DateTime dt, int startYear)
         {
-            return dt.GetSpecialUnixTimeSeconds(dt.Kind == DateTimeKind.Utc ? TimeSpan.Zero : TimeZoneInfo.Local.BaseUtcOffset, startYear);
+            return dt.GetSpecialUnixTimeSeconds(
+                dt.Kind == DateTimeKind.Utc ? TimeSpan.Zero : TimeZoneInfo.Local.BaseUtcOffset, startYear);
         }
 
         /// <summary>
@@ -68,7 +74,6 @@ namespace CodeWF.Tools.Extensions
                     new DateTimeOffset(startYear, 1, 1, 0, 0, 0, TimeSpan.Zero).UtcDateTime.Ticks) / 1_000_000L);
 
 
-
         /// <summary>
         /// 获取该时间相对于指定年份的精确到毫秒的特殊时间戳, 默认使用当前系统时区的偏移量，比如北京时间的TimeSpan.FromHours(8)
         /// </summary>
@@ -77,7 +82,8 @@ namespace CodeWF.Tools.Extensions
         /// <returns></returns>
         public static ulong GetSpecialUnixTimeMilliseconds(this DateTime dt, int startYear)
         {
-            return dt.GetSpecialUnixTimeMilliseconds(dt.Kind == DateTimeKind.Utc ? TimeSpan.Zero : TimeZoneInfo.Local.BaseUtcOffset, startYear);
+            return dt.GetSpecialUnixTimeMilliseconds(
+                dt.Kind == DateTimeKind.Utc ? TimeSpan.Zero : TimeZoneInfo.Local.BaseUtcOffset, startYear);
         }
 
         /// <summary>
@@ -100,6 +106,55 @@ namespace CodeWF.Tools.Extensions
         public static ulong GetSpecialUnixTimeMilliseconds(this DateTimeOffset dt, int startYear) =>
             (uint)((dt.UtcDateTime.Ticks -
                     new DateTimeOffset(startYear, 1, 1, 0, 0, 0, TimeSpan.Zero).UtcDateTime.Ticks) / 10_000L);
+
+        /// <summary>
+        /// 获取两个时间之间的毫秒间隔，默认使用当前系统时区的偏移量
+        /// </summary>
+        /// <param name="endDt">结束时间</param>
+        /// <param name="startDt">开始时间</param>
+        /// <returns>毫秒间隔</returns>
+        public static uint GetTimeIntervalMilliseconds(this DateTime endDt, DateTime startDt)
+        {
+            return endDt.GetTimeIntervalMilliseconds(
+                endDt.Kind == DateTimeKind.Utc ? TimeSpan.Zero : TimeZoneInfo.Local.BaseUtcOffset, startDt);
+        }
+
+        /// <summary>
+        /// 获取两个时间之间的毫秒间隔，可指定时区偏移量
+        /// </summary>
+        /// <param name="endDt">结束时间</param>
+        /// <param name="offset">时区偏移量</param>
+        /// <param name="startDt">开始时间</param>
+        /// <returns>毫秒间隔</returns>
+        public static uint GetTimeIntervalMilliseconds(this DateTime endDt, TimeSpan offset, DateTime startDt)
+        {
+            var endOffset = new DateTimeOffset(endDt, offset);
+            var startOffset = new DateTimeOffset(startDt, offset);
+            var interval = endOffset - startOffset;
+            CheckForPrecisionLoss(interval);
+            return (uint)interval.TotalMilliseconds;
+        }
+
+        /// <summary>
+        /// 获取两个DateTimeOffset类型时间之间的毫秒间隔
+        /// </summary>
+        /// <param name="endDt">结束时间</param>
+        /// <param name="startDt">开始时间</param>
+        /// <returns>毫秒间隔</returns>
+        public static uint GetTimeIntervalMilliseconds(this DateTimeOffset endDt, DateTimeOffset startDt)
+        {
+            var interval = endDt - startDt;
+            CheckForPrecisionLoss(interval);
+            return (uint)interval.TotalMilliseconds;
+        }
+
+        private static void CheckForPrecisionLoss(TimeSpan interval)
+        {
+            if (interval.TotalDays > MaxDaysForUint)
+            {
+                throw new OverflowException("时间间隔过大，转换为uint类型时会丢失精度");
+            }
+        }
 
         /// <summary>
         /// 获取该时间相对于1970-01-01T00:00:00Z的毫秒数, 默认使用当前系统时区的偏移量，比如北京时间的TimeSpan.FromHours(8)
