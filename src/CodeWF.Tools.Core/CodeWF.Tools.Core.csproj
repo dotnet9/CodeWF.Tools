@@ -35,4 +35,7 @@
 		<None Include="..\..\logo.png" Pack="true" PackagePath="" />
 		<None Include="..\..\logo.ico" Pack="true" PackagePath="" />
 	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.2" />
+	</ItemGroup>
 </Project>

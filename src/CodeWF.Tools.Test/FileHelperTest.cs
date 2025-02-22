@@ -1,6 +1,5 @@
 ﻿using CodeWF.Tools.FileExtensions;
 using System.Reflection;
-using Xunit;
 
 namespace CodeWF.Tools.Test;
 
