@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using Avalonia.Controls;
-using Avalonia.Controls.Shapes;
+﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
 using CodeWF.Tools.AvaloniaDemo.Models;
 using CodeWF.Tools.Extensions;
 using CodeWF.Tools.Helpers;
+using CodeWF.Tools.Image;
+using System;
+using System.Collections.Generic;
 
 namespace CodeWF.Tools.AvaloniaDemo.Views;
 
@@ -91,5 +91,22 @@ public partial class MainView : UserControl
         {
             TxtJsonStr.Text = $"序列化异常：{errorMsg}";
         }
+    }
+
+    private void GeneratorQrCode_OnClick(object? sender, RoutedEventArgs e)
+    {
+        string phoneNumber = "18628061111";
+        string promptText = "临时停车，扫码挪车";
+        string savePath = "nuoche.png";
+
+        QrCodeGenerator.GenerateQrCode(phoneNumber, promptText, savePath);
+
+
+        phoneNumber = "1234567890";
+        promptText = "卫生打扫，欢迎联系";
+        savePath = "clear.png";
+
+        QrCodeGenerator.GenerateQrCode(phoneNumber, promptText, savePath);
+        Console.WriteLine("图片已生成并保存到：" + savePath);
     }
 }
