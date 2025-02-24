@@ -115,8 +115,8 @@ namespace CodeWF.Tools.Extensions
         /// <returns>毫秒间隔</returns>
         public static uint GetTimeIntervalMilliseconds(this DateTime endDt, DateTime startDt)
         {
-            return endDt.GetTimeIntervalMilliseconds(
-                endDt.Kind == DateTimeKind.Utc ? TimeSpan.Zero : TimeZoneInfo.Local.BaseUtcOffset, startDt);
+            var offset = endDt.Kind == DateTimeKind.Utc ? TimeSpan.Zero : TimeZoneInfo.Local.BaseUtcOffset;
+            return endDt.GetTimeIntervalMilliseconds(offset, startDt);
         }
 
         /// <summary>
@@ -128,8 +128,8 @@ namespace CodeWF.Tools.Extensions
         /// <returns>毫秒间隔</returns>
         public static uint GetTimeIntervalMilliseconds(this DateTime endDt, TimeSpan offset, DateTime startDt)
         {
-            var endOffset = new DateTimeOffset(endDt, offset);
-            var startOffset = new DateTimeOffset(startDt, offset);
+            var endOffset = CreateDateTimeOffset(endDt, offset);
+            var startOffset = CreateDateTimeOffset(startDt, offset);
             var interval = endOffset - startOffset;
             CheckForPrecisionLoss(interval);
             return (uint)interval.TotalMilliseconds;
@@ -146,6 +146,16 @@ namespace CodeWF.Tools.Extensions
             var interval = endDt - startDt;
             CheckForPrecisionLoss(interval);
             return (uint)interval.TotalMilliseconds;
+        }
+
+        private static DateTimeOffset CreateDateTimeOffset(DateTime dt, TimeSpan offset)
+        {
+            if (dt.Kind == DateTimeKind.Local)
+            {
+                dt = DateTime.SpecifyKind(dt, DateTimeKind.Unspecified);
+            }
+
+            return new DateTimeOffset(dt, offset);
         }
 
         private static void CheckForPrecisionLoss(TimeSpan interval)
@@ -242,6 +252,45 @@ namespace CodeWF.Tools.Extensions
         public static DateTimeOffset
             FromSpecialUnixTimeSecondsToDateTimeOffset(this uint specialSeconds, int startYear) =>
             new DateTimeOffset(startYear, 1, 1, 0, 0, 0, TimeSpan.Zero).AddTicks(specialSeconds * 1_000_000L);
+
+        /// <summary>
+        /// 根据开始时间和毫秒间隔，计算结束时间，默认使用当前系统时区的偏移量
+        /// </summary>
+        /// <param name="startDt">开始时间</param>
+        /// <param name="milliseconds">毫秒间隔</param>
+        /// <returns>结束时间</returns>
+        public static DateTime GetEndDateTime(this DateTime startDt, uint milliseconds)
+        {
+            var offset = startDt.Kind == DateTimeKind.Utc ? TimeSpan.Zero : TimeZoneInfo.Local.BaseUtcOffset;
+            var startOffset = CreateDateTimeOffset(startDt, offset);
+            var endOffset = startOffset.AddMilliseconds(milliseconds);
+            return endOffset.DateTime;
+        }
+
+        /// <summary>
+        /// 根据开始时间、时区偏移量和毫秒间隔，计算结束时间
+        /// </summary>
+        /// <param name="startDt">开始时间</param>
+        /// <param name="offset">时区偏移量</param>
+        /// <param name="milliseconds">毫秒间隔</param>
+        /// <returns>结束时间</returns>
+        public static DateTime GetEndDateTime(this DateTime startDt, TimeSpan offset, uint milliseconds)
+        {
+            var startOffset = CreateDateTimeOffset(startDt, offset);
+            var endOffset = startOffset.AddMilliseconds(milliseconds);
+            return endOffset.DateTime;
+        }
+
+        /// <summary>
+        /// 根据开始的DateTimeOffset类型时间和毫秒间隔，计算结束的DateTimeOffset类型时间
+        /// </summary>
+        /// <param name="startDt">开始时间</param>
+        /// <param name="milliseconds">毫秒间隔</param>
+        /// <returns>结束时间</returns>
+        public static DateTimeOffset GetEndDateTimeOffset(this DateTimeOffset startDt, uint milliseconds)
+        {
+            return startDt.AddMilliseconds(milliseconds);
+        }
 
         /// <summary>
         /// 将相对于1970-01-01T00:00:00Z的毫秒数转换为DateTime
