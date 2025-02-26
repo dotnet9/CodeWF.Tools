@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 		<AssemblyName>$(AssemblyName)</AssemblyName>
 		<Authors>沙漠尽头的狼</Authors>
 		<ApplicationIcon>..\..\logo.ico</ApplicationIcon>
@@ -36,6 +36,6 @@
 		<None Include="..\..\logo.ico" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.2" />
+	  <PackageReference Include="System.Text.Encoding.CodePages" Version="10.0.0-preview.1.25080.5" />
 	</ItemGroup>
 </Project>
