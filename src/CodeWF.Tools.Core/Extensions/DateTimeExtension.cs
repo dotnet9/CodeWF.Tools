@@ -108,15 +108,25 @@ namespace CodeWF.Tools.Extensions
                     new DateTimeOffset(startYear, 1, 1, 0, 0, 0, TimeSpan.Zero).UtcDateTime.Ticks) / 10_000L);
 
         /// <summary>
-        /// 获取两个时间之间的毫秒间隔，默认使用当前系统时区的偏移量
+        /// 获取两个时间之间的毫秒间隔，会自动处理不同的DateTimeKind
         /// </summary>
         /// <param name="endDt">结束时间</param>
         /// <param name="startDt">开始时间</param>
         /// <returns>毫秒间隔</returns>
         public static uint GetTimeIntervalMilliseconds(this DateTime endDt, DateTime startDt)
         {
-            var offset = endDt.Kind == DateTimeKind.Utc ? TimeSpan.Zero : TimeZoneInfo.Local.BaseUtcOffset;
-            return endDt.GetTimeIntervalMilliseconds(offset, startDt);
+            // 统一转换为UTC时间进行比较
+            var endUtc = endDt.Kind == DateTimeKind.Local ? endDt.ToUniversalTime() :
+                         endDt.Kind == DateTimeKind.Unspecified ? DateTime.SpecifyKind(endDt, DateTimeKind.Utc) :
+                         endDt;
+                         
+            var startUtc = startDt.Kind == DateTimeKind.Local ? startDt.ToUniversalTime() :
+                           startDt.Kind == DateTimeKind.Unspecified ? DateTime.SpecifyKind(startDt, DateTimeKind.Utc) :
+                           startDt;
+
+            var interval = endUtc - startUtc;
+            CheckForPrecisionLoss(interval);
+            return (uint)interval.TotalMilliseconds;
         }
 
         /// <summary>
@@ -496,5 +506,164 @@ namespace CodeWF.Tools.Extensions
 
             return strResout;
         }
+
+        #region 时间转换核心方法
+
+        /// <summary>
+        /// 将本地时间转换为UTC时间
+        /// </summary>
+        /// <param name="localTime">本地时间</param>
+        /// <returns>UTC时间</returns>
+        /// <example>
+        /// var localTime = new DateTime(2024, 1, 1, 8, 0, 0);
+        /// var utcTime = localTime.ToUtcTime(); // 2024-01-01 00:00:00
+        /// </example>
+        public static DateTime ToUtcTime(this DateTime localTime)
+        {
+            if (localTime.Kind == DateTimeKind.Utc)
+                return localTime;
+            
+            return localTime.Kind == DateTimeKind.Unspecified
+                ? DateTime.SpecifyKind(localTime, DateTimeKind.Local).ToUniversalTime()
+                : localTime.ToUniversalTime();
+        }
+
+        /// <summary>
+        /// 将UTC时间转换为本地时间
+        /// </summary>
+        /// <param name="utcTime">UTC时间</param>
+        /// <returns>本地时间</returns>
+        /// <example>
+        /// var utcTime = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        /// var localTime = utcTime.ToLocalTime(); // 在中国为 2024-01-01 08:00:00
+        /// </example>
+        public static DateTime ToLocalTime(this DateTime utcTime)
+        {
+            if (utcTime.Kind == DateTimeKind.Local)
+                return utcTime;
+            
+            return utcTime.Kind == DateTimeKind.Unspecified
+                ? DateTime.SpecifyKind(utcTime, DateTimeKind.Utc).ToLocalTime()
+                : utcTime.ToLocalTime();
+        }
+
+        #endregion
+
+        #region Unix时间戳转换
+
+        /// <summary>
+        /// 获取UTC时间的Unix时间戳（秒）
+        /// </summary>
+        /// <param name="dateTime">UTC时间</param>
+        /// <returns>Unix时间戳（秒）</returns>
+        /// <example>
+        /// var utcNow = DateTime.UtcNow;
+        /// var timestamp = utcNow.ToUnixTimeSeconds();
+        /// </example>
+        public static long ToUnixTimeSeconds(this DateTime dateTime)
+        {
+            var utcTime = dateTime.ToUtcTime();
+            return new DateTimeOffset(utcTime).ToUnixTimeSeconds();
+        }
+
+        /// <summary>
+        /// 获取UTC时间的Unix时间戳（毫秒）
+        /// </summary>
+        /// <param name="dateTime">UTC时间</param>
+        /// <returns>Unix时间戳（毫秒）</returns>
+        public static long ToUnixTimeMilliseconds(this DateTime dateTime)
+        {
+            var utcTime = dateTime.ToUtcTime();
+            return new DateTimeOffset(utcTime).ToUnixTimeMilliseconds();
+        }
+
+        /// <summary>
+        /// 从Unix时间戳（秒）转换为本地时间
+        /// </summary>
+        /// <param name="seconds">Unix时间戳（秒）</param>
+        /// <returns>本地时间</returns>
+        /// <example>
+        /// var timestamp = 1704067200; // 2024-01-01 00:00:00 UTC
+        /// var localTime = timestamp.FromUnixTimeSeconds(); // 在中国为 2024-01-01 08:00:00
+        /// </example>
+        public static DateTime FromUnixTimeSeconds(this long seconds)
+        {
+            return DateTimeOffset.FromUnixTimeSeconds(seconds).LocalDateTime;
+        }
+
+        /// <summary>
+        /// 从Unix时间戳（毫秒）转换为本地时间
+        /// </summary>
+        /// <param name="milliseconds">Unix时间戳（毫秒）</param>
+        /// <returns>本地时间</returns>
+        public static DateTime FromUnixTimeMilliseconds(this long milliseconds)
+        {
+            return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).LocalDateTime;
+        }
+
+        #endregion
+
+        #region 时间间隔计算
+
+        /// <summary>
+        /// 计算两个时间之间的间隔（毫秒）
+        /// </summary>
+        /// <param name="endTime">结束时间</param>
+        /// <param name="startTime">开始时间</param>
+        /// <returns>时间间隔（毫秒）</returns>
+        /// <example>
+        /// var start = DateTime.Now;
+        /// var end = start.AddHours(1);
+        /// var interval = end.GetIntervalMilliseconds(start); // 3600000
+        /// </example>
+        public static long GetIntervalMilliseconds(this DateTime endTime, DateTime startTime)
+        {
+            return (long)(endTime - startTime).TotalMilliseconds;
+        }
+
+        /// <summary>
+        /// 获取指定时间间隔后的时间
+        /// </summary>
+        /// <param name="startTime">开始时间</param>
+        /// <param name="milliseconds">时间间隔（毫秒）</param>
+        /// <returns>结束时间</returns>
+        public static DateTime AddMillisecondsTime(this DateTime startTime, long milliseconds)
+        {
+            return startTime.AddMilliseconds(milliseconds);
+        }
+
+        #endregion
+
+        #region 人性化时间显示
+
+        /// <summary>
+        /// 获取人性化的时间差描述
+        /// </summary>
+        /// <param name="current">当前时间</param>
+        /// <param name="compareTime">比较时间</param>
+        /// <returns>人性化的时间差描述</returns>
+        /// <example>
+        /// var now = DateTime.Now;
+        /// var past = now.AddHours(-2);
+        /// var desc = now.GetFriendlyTimeSpan(past); // "2小时前"
+        /// </example>
+        public static string GetFriendlyTimeSpan(this DateTime current, DateTime compareTime)
+        {
+            var timeSpan = current - compareTime;
+            if (timeSpan.TotalDays > 365)
+                return $"{(int)(timeSpan.TotalDays / 365)}年前";
+            if (timeSpan.TotalDays > 30)
+                return $"{(int)(timeSpan.TotalDays / 30)}个月前";
+            if (timeSpan.TotalDays >= 1)
+                return $"{(int)timeSpan.TotalDays}天前";
+            if (timeSpan.TotalHours >= 1)
+                return $"{(int)timeSpan.TotalHours}小时前";
+            if (timeSpan.TotalMinutes >= 1)
+                return $"{(int)timeSpan.TotalMinutes}分钟前";
+            
+            return "刚刚";
+        }
+
+        #endregion
     }
 }

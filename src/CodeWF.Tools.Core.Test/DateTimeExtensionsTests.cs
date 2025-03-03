@@ -65,6 +65,17 @@ public class DateTimeExtensionsTests
         Assert.Equal(start.AddMilliseconds(milliseconds), end);
     }
 
+
+    [Fact]
+    public void GetEndDateTimeDiffKind()
+    {
+        var start = new DateTime(2025, 3, 3, 14, 02, 23, DateTimeKind.Utc);
+        var end = new DateTime(2025, 3, 3, 14, 03, 23, DateTimeKind.Unspecified);
+        var milliseconds = end.GetTimeIntervalMilliseconds(start);
+        Assert.True(milliseconds > 0);
+    }
+
+
     private static DateTimeOffset CreateDateTimeOffset(DateTime dt, TimeSpan offset)
     {
         if (dt.Kind == DateTimeKind.Local)
