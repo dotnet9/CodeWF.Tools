@@ -95,18 +95,12 @@ public partial class MainView : UserControl
 
     private void GeneratorQrCode_OnClick(object? sender, RoutedEventArgs e)
     {
-        string phoneNumber = "18628061111";
-        string promptText = "临时停车，扫码挪车";
-        string savePath = "nuoche.png";
+        var title = "临时停车，扫码挪车";
+        var content = "https://codewf.com/qrcode?phone=18600001111";
+        var ad = "码坊助力：https://codewf.com";
+        var savePath = "nuoche.png";
 
-        QrCodeGenerator.GenerateQrCode(phoneNumber, promptText, savePath);
-
-
-        phoneNumber = "1234567890";
-        promptText = "卫生打扫，欢迎联系";
-        savePath = "clear.png";
-
-        QrCodeGenerator.GenerateQrCode(phoneNumber, promptText, savePath);
+        QrCodeGenerator.GenerateQrCode(title, ad, content, savePath);
         Console.WriteLine("图片已生成并保存到：" + savePath);
     }
 }

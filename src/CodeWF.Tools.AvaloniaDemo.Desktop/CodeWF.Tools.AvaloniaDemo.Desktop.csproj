@@ -23,13 +23,17 @@
 		<IsTrimmable>true</IsTrimmable>
 		<PublishTrimmed>true</PublishTrimmed>
 	</PropertyGroup>
+	<PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net10.0'))">
+		<IsTrimmable>true</IsTrimmable>
+		<PublishTrimmed>true</PublishTrimmed>
+	</PropertyGroup>
 	<ItemGroup>
 		<TrimmerRootDescriptor Include="Roots.xml" />
 		<Content Include="logo.ico" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Avalonia.Desktop" Version="11.2.4" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.2.5" />
 	</ItemGroup>
 
 	<ItemGroup>

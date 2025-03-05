@@ -7,7 +7,7 @@ namespace CodeWF.Tools.Image;
 
 public static class QrCodeGenerator
 {
-    public static void GenerateQrCode(string phoneNumber, string promptText, string imagePath)
+    public static void GenerateQrCode(string title, string ad, string content, string imagePath)
     {
         // 生成二维码
         var qrCodeWriter = new BarcodeWriterPixelData
@@ -24,7 +24,6 @@ public static class QrCodeGenerator
             }
         };
 
-        var content = $"tel:{phoneNumber}";
         var pixelData = qrCodeWriter.Write(content);
 
         // 创建二维码图像
@@ -41,10 +40,10 @@ public static class QrCodeGenerator
             .FontPointSize(32)
             .FillColor(MagickColors.Blue) // 设置文字颜色
             .TextAlignment(TextAlignment.Left) // 左对齐
-            .Text(25, 150, promptText)
+            .Text(25, 150, title)
             .FontPointSize(14)
             .FillColor(MagickColors.Black) // 设置文字颜色
-            .Text(50, 250, "生成网址：https://dotnet9.com/qrcode");
+            .Text(50, 250, ad);
         background.Draw(wordImage);
 
         // 合并二维码到背景
