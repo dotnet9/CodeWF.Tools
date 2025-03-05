@@ -9,16 +9,15 @@ public static class QrCodeGenerator
 {
     public static void GenerateQrCode(string title, string ad, string content, string imagePath)
     {
-        // 生成二维码
         var qrCodeWriter = new BarcodeWriterPixelData
         {
             Format = BarcodeFormat.QR_CODE,
             Options = new QrCodeEncodingOptions
             {
-                Width = 250,                // 增加尺寸以提高清晰度
-                Height = 250,               // 增加尺寸以提高清晰度
-                Margin = 1,                 // 设置合适的边距
-                ErrorCorrection = ZXing.QrCode.Internal.ErrorCorrectionLevel.M,  // 使用中等纠错级别
+                Width = 360,               
+                Height = 360,
+                Margin = 2,                 
+                ErrorCorrection = ZXing.QrCode.Internal.ErrorCorrectionLevel.H, 
                 CharacterSet = "UTF-8",
                 DisableECI = true
             }
@@ -26,30 +25,31 @@ public static class QrCodeGenerator
 
         var pixelData = qrCodeWriter.Write(content);
 
-        // 创建二维码图像
         using var qrCodeImage = new MagickImage();
         var settings = new PixelReadSettings((uint)pixelData.Width, (uint)pixelData.Height, StorageType.Char, PixelMapping.RGBA);
         qrCodeImage.ReadPixels(pixelData.Pixels, settings);
 
-        // 创建白色背景
-        using var background = new MagickImage(MagickColors.White, 600, 300);
+        using var background = new MagickImage(MagickColors.White, 360, 420);
 
-        // 添加文字
-        var wordImage = new Drawables()
-            .Font("KaiTi") // 添加支持中文的字体
-            .FontPointSize(32)
-            .FillColor(MagickColors.Blue) // 设置文字颜色
-            .TextAlignment(TextAlignment.Left) // 左对齐
-            .Text(25, 150, title)
-            .FontPointSize(14)
-            .FillColor(MagickColors.Black) // 设置文字颜色
-            .Text(50, 250, ad);
-        background.Draw(wordImage);
+        var titleText = new Drawables()
+            .Font("KaiTi") 
+            .FontPointSize(36)
+            .FillColor(new MagickColor("#E74C3C"))
+            .TextAlignment(TextAlignment.Center)
+            .Text(180, 45, title);
+        background.Draw(titleText);
+        
+        background.Composite(qrCodeImage, 0, 50, CompositeOperator.Over);
 
-        // 合并二维码到背景
-        background.Composite(qrCodeImage, 325, 25, CompositeOperator.Over);
+        var adText = new Drawables()
+            .Font("KaiTi")
+            .FontPointSize(13)
+            .FillColor(new MagickColor("#666666")) 
+            .TextAlignment(TextAlignment.Center)
+            .Text(180, 400, ad);
+        background.Draw(adText);
 
-        // 保存图像
+        background.Quality = 95;
         background.Write(imagePath);
     }
 }
