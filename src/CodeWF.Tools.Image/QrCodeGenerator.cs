@@ -32,9 +32,9 @@ public static class QrCodeGenerator
         using var background = new MagickImage(MagickColors.White, 360, 420);
 
         var titleText = new Drawables()
-            .Font("KaiTi") 
-            .FontPointSize(36)
-            .FillColor(new MagickColor("#E74C3C"))
+            .Font("KaiTi")
+            .FontPointSize(40)
+            .FillColor(new MagickColor("#1A237E"))
             .TextAlignment(TextAlignment.Center)
             .Text(180, 45, title);
         background.Draw(titleText);
@@ -43,13 +43,13 @@ public static class QrCodeGenerator
 
         var adText = new Drawables()
             .Font("KaiTi")
-            .FontPointSize(13)
-            .FillColor(new MagickColor("#666666")) 
+            .FontPointSize(15)
+            .FillColor(new MagickColor("#1A237E"))
             .TextAlignment(TextAlignment.Center)
             .Text(180, 400, ad);
         background.Draw(adText);
 
-        background.Quality = 95;
+        background.Quality = 100;
         background.Write(imagePath);
     }
 }
