@@ -95,9 +95,9 @@ public partial class MainView : UserControl
 
     private void GeneratorQrCode_OnClick(object? sender, RoutedEventArgs e)
     {
-        var title = "扫一扫，挪车";
+        var title = "微信扫码，通知挪车";
         var content = "https://codewf.com";
-        var ad = "挪车助力：https://codewf.com";
+        var ad = "码坊：https://codewf.com";
         var savePath = "nuoche.png";
 
         QrCodeGenerator.GenerateQrCode(title, ad, content, savePath);
