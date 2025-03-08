@@ -8,6 +8,7 @@ using CodeWF.Tools.Helpers;
 using CodeWF.Tools.Image;
 using System;
 using System.Collections.Generic;
+using CodeWF.Tools.FileExtensions;
 
 namespace CodeWF.Tools.AvaloniaDemo.Views;
 
@@ -96,14 +97,14 @@ public partial class MainView : UserControl
 
     private void GeneratorQrCode_OnClick(object? sender, RoutedEventArgs e)
     {
-        var title = "微信扫码，通知挪车";
+        var title = "扫码挪车";
 
         var content =
-            $"https://codewf.com/qr/16800000000";
-        var ad = "码坊：https://codewf.com";
+            $"https://codewf.com/nuoche?p=16800000000";
         var savePath = "nuoche.png";
 
-        QrCodeGenerator.GenerateQrCode(title, ad, content, savePath);
+        QrCodeGenerator.GenerateQrCode(title, content, savePath);
+        FileHelper.OpenFolderAndSelectFile(savePath);
         Console.WriteLine("图片已生成并保存到：" + savePath);
     }
 }
