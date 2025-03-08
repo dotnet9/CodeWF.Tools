@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
+using Bogus.DataSets;
 using CodeWF.Tools.AvaloniaDemo.Models;
 using CodeWF.Tools.Extensions;
 using CodeWF.Tools.Helpers;
@@ -96,7 +97,9 @@ public partial class MainView : UserControl
     private void GeneratorQrCode_OnClick(object? sender, RoutedEventArgs e)
     {
         var title = "微信扫码，通知挪车";
-        var content = "https://codewf.com";
+
+        var content =
+            $"https://codewf.com/qr/16800000000";
         var ad = "码坊：https://codewf.com";
         var savePath = "nuoche.png";
 
