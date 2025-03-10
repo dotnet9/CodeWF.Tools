@@ -7,7 +7,7 @@ namespace CodeWF.Tools.Image;
 
 public static class QrCodeGenerator
 {
-    public static void GenerateQrCode(string title, string content, string imagePath, string subTitle = "")
+    public static void GenerateQrCode(string title, string content, string imagePath, string? subTitle = "")
     {
         var qrCodeWriter = new BarcodeWriterPixelData
         {
@@ -29,7 +29,7 @@ public static class QrCodeGenerator
         var settings = new PixelReadSettings((uint)pixelData.Width, (uint)pixelData.Height, StorageType.Char, PixelMapping.RGBA);
         qrCodeImage.ReadPixels(pixelData.Pixels, settings);
 
-        var backgroundHeight = string.IsNullOrEmpty(subTitle) ? 600u : 630u;
+        var backgroundHeight = string.IsNullOrWhiteSpace(subTitle) ? 600u : 630u;
         using var background = new MagickImage(MagickColors.White, 500, backgroundHeight);
 
         background.BorderColor = new MagickColor("#2888E2");
@@ -45,7 +45,7 @@ public static class QrCodeGenerator
 
         background.Composite(qrCodeImage, 50, 170, CompositeOperator.Over);
 
-        if (!string.IsNullOrEmpty(subTitle))
+        if (!string.IsNullOrWhiteSpace(subTitle))
         {
             var subTitleText = new Drawables()
                 .Font("SimHei")
