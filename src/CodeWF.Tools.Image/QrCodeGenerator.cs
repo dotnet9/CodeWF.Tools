@@ -7,7 +7,7 @@ namespace CodeWF.Tools.Image;
 
 public static class QrCodeGenerator
 {
-    public static void GenerateVehicleMoveQrCode(string title, string content, string imagePath, string subTitle = "")
+    public static void GenerateQrCode(string title, string content, string imagePath, string subTitle = "")
     {
         var qrCodeWriter = new BarcodeWriterPixelData
         {

@@ -103,7 +103,7 @@ public partial class MainView : UserControl
             $"https://codewf.com/nuoche?p=16800000000";
         var savePath = "nuoche.png";
 
-        QrCodeGenerator.GenerateVehicleMoveQrCode(title, content, savePath, subTitle);
+        QrCodeGenerator.GenerateQrCode(title, content, savePath, subTitle);
         FileHelper.OpenFolderAndSelectFile(savePath);
         Console.WriteLine("图片已生成并保存到：" + savePath);
     }
