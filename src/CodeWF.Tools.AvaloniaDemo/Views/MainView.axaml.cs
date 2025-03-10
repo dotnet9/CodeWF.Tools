@@ -98,12 +98,12 @@ public partial class MainView : UserControl
     private void GeneratorQrCode_OnClick(object? sender, RoutedEventArgs e)
     {
         var title = "扫码挪车";
-
+        var subTitle = "扫码联系车主或拨打电话: 16800000000";
         var content =
             $"https://codewf.com/nuoche?p=16800000000";
         var savePath = "nuoche.png";
 
-        QrCodeGenerator.GenerateQrCode(title, content, savePath);
+        QrCodeGenerator.GenerateVehicleMoveQrCode(title, content, savePath, subTitle);
         FileHelper.OpenFolderAndSelectFile(savePath);
         Console.WriteLine("图片已生成并保存到：" + savePath);
     }

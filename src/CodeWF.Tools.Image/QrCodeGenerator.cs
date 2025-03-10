@@ -7,7 +7,7 @@ namespace CodeWF.Tools.Image;
 
 public static class QrCodeGenerator
 {
-    public static void GenerateQrCode(string title, string content, string imagePath)
+    public static void GenerateVehicleMoveQrCode(string title, string content, string imagePath, string subTitle = "")
     {
         var qrCodeWriter = new BarcodeWriterPixelData
         {
@@ -29,20 +29,32 @@ public static class QrCodeGenerator
         var settings = new PixelReadSettings((uint)pixelData.Width, (uint)pixelData.Height, StorageType.Char, PixelMapping.RGBA);
         qrCodeImage.ReadPixels(pixelData.Pixels, settings);
 
-        using var background = new MagickImage(MagickColors.White, 500, 600);
+        var backgroundHeight = string.IsNullOrEmpty(subTitle) ? 600u : 630u;
+        using var background = new MagickImage(MagickColors.White, 500, backgroundHeight);
 
         background.BorderColor = new MagickColor("#2888E2");
         background.Border(8);
 
         var titleText = new Drawables()
             .Font("SimHei")
-            .FontPointSize(90)
+            .FontPointSize(95)
             .FillColor(new MagickColor("#FF5722"))
             .TextAlignment(TextAlignment.Center)
             .Text(250, 120, title);
         background.Draw(titleText);
 
         background.Composite(qrCodeImage, 50, 170, CompositeOperator.Over);
+
+        if (!string.IsNullOrEmpty(subTitle))
+        {
+            var subTitleText = new Drawables()
+                .Font("SimHei")
+                .FontPointSize(20)
+                .FillColor(new MagickColor("#333333"))
+                .TextAlignment(TextAlignment.Center)
+                .Text(250, 600, subTitle);
+            background.Draw(subTitleText);
+        }
 
         //using var logo = new MagickImage("logo.png");
         //logo.Resize(100, 100);
