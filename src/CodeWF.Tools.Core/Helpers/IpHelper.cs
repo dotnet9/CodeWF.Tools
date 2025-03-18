@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -60,24 +61,43 @@ public static class IpHelper
     }
 
     /// <summary>
-    ///     验证UDP组播地址是否可用
+    ///     验证UDP地址是否可用（支持组播和普通地址）
     /// </summary>
-    /// <param name="ip">组播IP</param>
-    /// <param name="port">组播端口</param>
-    /// <returns></returns>
-    public static async Task<bool> CheckMulticastAvailabilityAsync(string ip, int port)
+    /// <param name="ip">IP地址</param>
+    /// <param name="port">端口</param>
+    /// <param name="errorMsg">失败时的错误信息</param>
+    /// <returns>成功返回true，失败返回false</returns>
+    public static bool CheckMulticastAvailability(string ip, int port, out string errorMsg)
     {
+        errorMsg = string.Empty;
+        
+        if (!IPAddress.TryParse(ip, out var ipAddress))
+        {
+            errorMsg = $"IP地址 '{ip}' 格式无效";
+            return false;
+        }
+
         UdpClient? udpClient = null;
         try
         {
             udpClient = new UdpClient();
-            udpClient.JoinMulticastGroup(IPAddress.Parse(ip));
-            var endPoint = new IPEndPoint(IPAddress.Parse(ip), port);
+            
+            // 只有对多播地址才调用JoinMulticastGroup
+            byte firstByte = ipAddress.GetAddressBytes()[0];
+            bool isMulticast = firstByte >= 224 && firstByte <= 239;
+            
+            if (isMulticast)
+            {
+                udpClient.JoinMulticastGroup(ipAddress);
+            }
+            
+            var endPoint = new IPEndPoint(ipAddress, port);
             var buffer = Encoding.Default.GetBytes("udp test");
-            await udpClient.SendAsync(buffer, buffer.Length, endPoint);
+            udpClient.Send(buffer, buffer.Length, endPoint);
         }
-        catch
+        catch (Exception ex)
         {
+            errorMsg = ex.Message;
             return false;
         }
         finally
@@ -92,6 +112,67 @@ public static class IpHelper
         }
 
         return true;
+    }
+
+    /// <summary>
+    ///     验证UDP组播地址是否可用，并返回结果和错误信息
+    /// </summary>
+    /// <param name="ip">组播IP</param>
+    /// <param name="port">组播端口</param>
+    /// <returns>返回一个元组，包含成功标志和错误信息</returns>
+    public static async Task<(bool Success, string ErrorMessage)> CheckMulticastAvailabilityWithDetailsAsync(string ip, int port)
+    {
+        if (!IPAddress.TryParse(ip, out var ipAddress))
+        {
+            return (false, $"IP地址 '{ip}' 格式无效");
+        }
+
+        UdpClient? udpClient = null;
+        try
+        {
+            udpClient = new UdpClient();
+            
+            // 只有对多播地址才调用JoinMulticastGroup
+            byte firstByte = ipAddress.GetAddressBytes()[0];
+            bool isMulticast = firstByte >= 224 && firstByte <= 239;
+            
+            if (isMulticast)
+            {
+                udpClient.JoinMulticastGroup(ipAddress);
+            }
+            
+            var endPoint = new IPEndPoint(ipAddress, port);
+            var buffer = Encoding.Default.GetBytes("udp test");
+            await udpClient.SendAsync(buffer, buffer.Length, endPoint);
+            
+            return (true, string.Empty);
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
+        finally
+        {
+            var isAvailable = udpClient?.Client?.Available ?? 0;
+            if (isAvailable > 0) udpClient?.Client?.Shutdown(SocketShutdown.Both);
+
+            udpClient?.Client?.Close();
+            udpClient?.Client?.Dispose();
+            udpClient?.Close();
+            udpClient = null;
+        }
+    }
+
+    /// <summary>
+    ///     验证UDP组播地址是否可用
+    /// </summary>
+    /// <param name="ip">组播IP</param>
+    /// <param name="port">组播端口</param>
+    /// <returns>成功返回true，失败返回false</returns>
+    public static async Task<bool> CheckMulticastAvailabilityAsync(string ip, int port)
+    {
+        var result = await CheckMulticastAvailabilityWithDetailsAsync(ip, port);
+        return result.Success;
     }
 
     /// <summary>
