@@ -17,9 +17,9 @@ public static class AppConfigHelper
 
     public static bool TryGet<T>(this Configuration config, string name, out T? value)
     {
-        var result = config.AppSettings.Settings[name].Value;
         try
         {
+            var result = config.AppSettings.Settings[name].Value;
             if (typeof(T) == typeof(string))
             {
                 value = (T)(object)result;
