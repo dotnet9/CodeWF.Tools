@@ -5,9 +5,11 @@
 /// </summary>
 enum ByteUnit
 {
-    B,
-    KB,
-    MB,
-    GB,
-    EB
+    B,      // Byte
+    KB,     // Kilobyte
+    MB,     // Megabyte
+    GB,     // Gigabyte
+    TB,     // Terabyte
+    PB,     // Petabyte
+    EB      // Exabyte
 }
