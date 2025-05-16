@@ -56,4 +56,24 @@ public static class AppConfigHelper
         var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
         config.Set(name, value);
     }
+
+    public static void SetOrAdd<T>(this Configuration config, string name, T value)
+    {
+        try
+        {
+            config.AppSettings.Settings[name].Value = value?.ToString();
+        }
+        catch
+        {
+            config.AppSettings.Settings.Add(name, value?.ToString());
+        }
+
+        config.Save(ConfigurationSaveMode.Modified);
+    }
+
+    public static void SetOrAdd<T>(string name, T value)
+    {
+        var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None); 
+        config.SetOrAdd(name, value);
+    }
 }
