@@ -11,7 +11,7 @@
 		<InformationalVersion>0.0.0.1</InformationalVersion>
 		<FileVersion>0.0.0.1</FileVersion>
 		<Copyright>https://dotnet9.com</Copyright>
-		<TargetFrameworks>net9.0;net10.0</TargetFrameworks>
+		<TargetFrameworks>net10.0-windows</TargetFrameworks>
 		<Nullable>enable</Nullable>
 		<BuiltInComInteropSupport>true</BuiltInComInteropSupport>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
@@ -33,7 +33,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Avalonia.Desktop" Version="11.3.0" />
+		<PackageReference Include="Avalonia.Desktop" Version="11.3.1" />
 	</ItemGroup>
 
 	<ItemGroup>
