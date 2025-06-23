@@ -18,6 +18,7 @@ public class Student
     public Dictionary<string, double> Scords { get; set; } 
 }
 
+[XmlRoot]
 public class Project
 {
     [XmlAttribute]
@@ -30,12 +31,12 @@ public class Project
     public int Record { get; set; }
 
     [XmlArray(ElementName = nameof(Members))]
-
-    [XmlArrayItem(typeof(Member))]
+    [XmlArrayItem(nameof(Member))]
     [XmlAttribute]
     public List<Member> Members { get; set; }
 }
 
+[XmlRoot]
 public class Member
 {
 

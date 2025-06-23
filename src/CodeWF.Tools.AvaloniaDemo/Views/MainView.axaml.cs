@@ -119,36 +119,31 @@ public partial class MainView : UserControl
     private void SerialClassWithDict_OnClick(object? sender, RoutedEventArgs e)
     {
         var data = School.ManualMockStudent();
+        TxtJsonStr.Text = data.ToJson(out var json, out var errorMsg) ? json : $"序列化异常：{errorMsg}";
+    }
+
+    private void SerialClassXml_OnClick(object? sender, RoutedEventArgs e)
+    {
         var projectData = new Project
         {
             Id = "Math",
             Name = "Software Engineer",
             Record = 100,
-            Members = new List<Member>
-            {
+            Members =
+            [
                 new Member { Name = "Alice", Age = 30 },
                 new Member { Name = "Bob", Age = 25 }
-            }   
+            ]
         };
         try
         {
             XmlSerializer xz = new XmlSerializer(typeof(Project));
             using var stream = new StreamWriter("D://test.xml", false, Encoding.UTF8);
             xz.Serialize(stream, projectData);
-            return;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            TxtJsonStr.Text = $"序列化异常：{ex}";
-            return;
-        }
-        if (data.ToJson(out var json,  out var errorMsg))
-        {
-            TxtJsonStr.Text = json;
-        }
-        else
-        {
-            TxtJsonStr.Text = $"序列化异常：{errorMsg}";
+            TxtXmlStr.Text = $"序列化异常：{ex}";
         }
     }
 
@@ -165,8 +160,9 @@ public partial class MainView : UserControl
         Console.WriteLine("图片已生成并保存到：" + savePath);
     }
 }
+
 [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Serialization)]
-[JsonSerializable(typeof(Dictionary<string,double>))]
+[JsonSerializable(typeof(Dictionary<string, double>))]
 internal partial class SourceGenerationContext : JsonSerializerContext
 {
 }

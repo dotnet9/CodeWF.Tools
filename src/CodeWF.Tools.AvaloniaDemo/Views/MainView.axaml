@@ -39,6 +39,12 @@
                 <SelectableTextBlock Name="TxtJsonStr" TextWrapping="Wrap"/>
             </StackPanel>
         </TabItem>
+        <TabItem Header="测试XML序列化">
+            <StackPanel>
+                <Button Content="一般类" Click="SerialClassXml_OnClick" />
+                <SelectableTextBlock Name="TxtXmlStr" TextWrapping="Wrap"/>
+            </StackPanel>
+        </TabItem>
         <TabItem Header="二维码">
             <StackPanel>
                 <Button Content="生成" Click="GeneratorQrCode_OnClick"/> 
