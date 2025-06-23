@@ -8,8 +8,11 @@ using CodeWF.Tools.Helpers;
 using CodeWF.Tools.Image;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Xml.Serialization;
 
 namespace CodeWF.Tools.AvaloniaDemo.Views;
 
@@ -116,6 +119,29 @@ public partial class MainView : UserControl
     private void SerialClassWithDict_OnClick(object? sender, RoutedEventArgs e)
     {
         var data = School.ManualMockStudent();
+        var projectData = new Project
+        {
+            Id = "Math",
+            Name = "Software Engineer",
+            Record = 100,
+            Members = new List<Member>
+            {
+                new Member { Name = "Alice", Age = 30 },
+                new Member { Name = "Bob", Age = 25 }
+            }   
+        };
+        try
+        {
+            XmlSerializer xz = new XmlSerializer(typeof(Project));
+            using var stream = new StreamWriter("D://test.xml", false, Encoding.UTF8);
+            xz.Serialize(stream, projectData);
+            return;
+        }
+        catch(Exception ex)
+        {
+            TxtJsonStr.Text = $"序列化异常：{ex}";
+            return;
+        }
         if (data.ToJson(out var json,  out var errorMsg))
         {
             TxtJsonStr.Text = json;
