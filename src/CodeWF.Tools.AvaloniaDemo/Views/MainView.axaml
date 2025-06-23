@@ -34,6 +34,8 @@
             <StackPanel>
                 <Button Content="一般类" Click="SerialNormalClass_OnClick" />
                 <Button Content="枚举类" Click="SerialClassWithEnum_OnClick" />
+				<Button Content="字典" Click="SerialDictionary_OnClick" />
+				<Button Content="复杂类" Click="SerialClassWithDict_OnClick" />
                 <SelectableTextBlock Name="TxtJsonStr" TextWrapping="Wrap"/>
             </StackPanel>
         </TabItem>

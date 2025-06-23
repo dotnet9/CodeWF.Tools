@@ -1,14 +1,15 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Styling;
-using Bogus.DataSets;
 using CodeWF.Tools.AvaloniaDemo.Models;
 using CodeWF.Tools.Extensions;
+using CodeWF.Tools.FileExtensions;
 using CodeWF.Tools.Helpers;
 using CodeWF.Tools.Image;
 using System;
 using System.Collections.Generic;
-using CodeWF.Tools.FileExtensions;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace CodeWF.Tools.AvaloniaDemo.Views;
 
@@ -52,7 +53,7 @@ public partial class MainView : UserControl
 
     private void Json2Yaml_OnClick(object sender, RoutedEventArgs e)
     {
-        var obj = School.GetStudent();
+        var obj = School.ManualMockStudent();
 
         obj.ToJson(out var jsonString, out var errorMsg);
         jsonString.JsonToYaml(out var yamlString, out errorMsg);
@@ -60,7 +61,7 @@ public partial class MainView : UserControl
 
     private void Yaml2Json_OnClick(object sender, RoutedEventArgs e)
     {
-        var obj = School.GetStudent();
+        var obj = School.ManualMockStudent();
 
         obj.ToYaml(out var yamlString, out var errorMsg);
         yamlString.YamlToJson(out var jsonString, out errorMsg);
@@ -95,6 +96,36 @@ public partial class MainView : UserControl
         }
     }
 
+    private void SerialDictionary_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var data = new Dictionary<string, double>();
+        data["math"] = 100.0;
+        data["english"] = 99.5;
+        var json = JsonSerializer.Serialize(data, SourceGenerationContext.Default.DictionaryStringDouble);
+        TxtJsonStr.Text = json;
+        //if (data.ToJson(out var json,  out var errorMsg))
+        //{
+        //    TxtJsonStr.Text = json;
+        //}
+        //else
+        //{
+        //    TxtJsonStr.Text = $"序列化异常：{errorMsg}";
+        //}
+    }
+
+    private void SerialClassWithDict_OnClick(object? sender, RoutedEventArgs e)
+    {
+        var data = School.ManualMockStudent();
+        if (data.ToJson(out var json,  out var errorMsg))
+        {
+            TxtJsonStr.Text = json;
+        }
+        else
+        {
+            TxtJsonStr.Text = $"序列化异常：{errorMsg}";
+        }
+    }
+
     private void GeneratorQrCode_OnClick(object? sender, RoutedEventArgs e)
     {
         var title = "扫码挪车";
@@ -107,4 +138,9 @@ public partial class MainView : UserControl
         FileHelper.OpenFolderAndSelectFile(savePath);
         Console.WriteLine("图片已生成并保存到：" + savePath);
     }
+}
+[JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Serialization)]
+[JsonSerializable(typeof(Dictionary<string,double>))]
+internal partial class SourceGenerationContext : JsonSerializerContext
+{
 }

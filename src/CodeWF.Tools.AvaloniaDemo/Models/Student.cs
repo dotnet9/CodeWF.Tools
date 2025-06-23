@@ -14,6 +14,7 @@ public class Student
     public List<Project>? Projects { get; set; }
 
     public Dictionary<string, string> Keys { get; set; }
+    public Dictionary<string, double> Scords { get; set; } 
 }
 
 public class Project
