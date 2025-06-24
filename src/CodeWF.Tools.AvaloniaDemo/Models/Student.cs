@@ -18,31 +18,23 @@ public class Student
     public Dictionary<string, double> Scords { get; set; } 
 }
 
-[XmlRoot]
 public class Project
 {
-    [XmlAttribute]
     public string Id { get; set; }
 
-    [XmlAttribute]
     public string Name { get; set; }
 
-    [XmlAttribute]
     public int Record { get; set; }
 
-    [XmlArray(ElementName = nameof(Members))]
-    [XmlArrayItem(nameof(Member))]
-    [XmlAttribute]
+    [XmlArray(ElementName = "Members")]
+
+    [XmlArrayItem(typeof(Member))]
     public List<Member> Members { get; set; }
 }
 
-[XmlRoot]
 public class Member
 {
-
-    [XmlAttribute]
     public string? Name { get; set; }
 
-    [XmlAttribute]
     public int Age { get; set; }
 }

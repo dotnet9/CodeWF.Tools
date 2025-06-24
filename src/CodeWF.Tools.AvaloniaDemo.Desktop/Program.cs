@@ -1,7 +1,10 @@
-﻿using System;
-using System.Reflection;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.ReactiveUI;
+using CodeWF.Tools.AvaloniaDemo.Models;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace CodeWF.Tools.AvaloniaDemo.Desktop;
 
@@ -11,6 +14,9 @@ class Program
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
     [STAThread]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Project))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(Member))]
+    [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(List<Member>))]
     public static void Main(string[] args)
     {
         App.ExecutingAssembly = Assembly.GetExecutingAssembly();
