@@ -32,6 +32,7 @@
         </TabItem>
         <TabItem Header="测试Json序列化">
             <StackPanel>
+                <Button Content="简单测试" Click="SerialTest_OnClick" />
                 <Button Content="一般类" Click="SerialNormalClass_OnClick" />
                 <Button Content="枚举类" Click="SerialClassWithEnum_OnClick" />
 				<Button Content="字典" Click="SerialDictionary_OnClick" />

@@ -70,6 +70,19 @@ public partial class MainView : UserControl
         yamlString.YamlToJson(out var jsonString, out errorMsg);
     }
 
+    private void SerialTest_OnClick(object? sender, RoutedEventArgs e)
+    {
+        List<Pen> data =
+        [
+            // 添加几支不同的笔到集合中
+            new("蓝色", 0.5, "圆珠笔", true),
+            new("黑色", 0.7, "中性笔", true),
+            new("红色", 1.0, "马克笔", false),
+            new("绿色", 0.3, "钢笔", true),
+        ];
+        TxtJsonStr.Text = data.ToJson(out var json, out var errorMsg) ? json : $"序列化异常：{errorMsg}";
+    }
+
     private void SerialNormalClass_OnClick(object? sender, RoutedEventArgs e)
     {
         List<Project> data = new()
