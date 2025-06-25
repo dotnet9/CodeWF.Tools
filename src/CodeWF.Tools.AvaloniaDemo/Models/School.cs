@@ -9,6 +9,7 @@ public static class School
         var student = new Student()
         {
             Name = "Liu",
+            Gender = Gender.Male,
             Year = 35,
             Tags = new[] { "Math", "Science", "History", "Art", "Computer Science" },
             MainProject = new Project
