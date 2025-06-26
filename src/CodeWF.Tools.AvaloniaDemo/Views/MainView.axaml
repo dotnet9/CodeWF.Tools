@@ -13,16 +13,17 @@
     </Design.DataContext>
     <TabControl TabStripPlacement="Left">
         <TabItem Header="App.config读写">
-            <StackPanel>
-                <Button Content="读取指定配置" Click="ReadSpecialConfig_OnClick" />
-                <Button Content="读取" Click="ReadMainConfig_OnClick" />
-                <Button Content="修改" Click="ChangeMainConfig_OnClick" />
-                <TextBlock x:Name="TxtMainThemeConfig" />
-            </StackPanel>
+            <ScrollViewer>
+                <StackPanel>
+                    <Button Content="读取指定配置" Click="ReadSpecialConfig_OnClick" />
+                    <Button Content="读取" Click="ReadMainConfig_OnClick" />
+                    <Button Content="修改" Click="ChangeMainConfig_OnClick" />
+                    <TextBlock x:Name="TxtMainThemeConfig" />
+                </StackPanel>
+            </ScrollViewer>
         </TabItem>
         <TabItem Header="Json与Yaml转换">
             <StackPanel>
-
                 <Button Content="Json转Yaml" Click="Json2Yaml_OnClick" />
                 <Button Content="Yaml转Json" Click="Yaml2Json_OnClick" />
             </StackPanel>
@@ -31,24 +32,29 @@
             <TextBlock Text="{Binding AssemblyInfo}" />
         </TabItem>
         <TabItem Header="测试Json序列化">
-            <StackPanel>
+            <ScrollViewer>
+                <StackPanel>
                 <Button Content="简单测试" Click="SerialTest_OnClick" />
-                <Button Content="一般类" Click="SerialNormalClass_OnClick" />
-                <Button Content="枚举类" Click="SerialClassWithEnum_OnClick" />
-				<Button Content="字典" Click="SerialDictionary_OnClick" />
-				<Button Content="复杂类" Click="SerialClassWithDict_OnClick" />
-                <SelectableTextBlock Name="TxtJsonStr" TextWrapping="Wrap"/>
-            </StackPanel>
+                    <Button Content="一般类" Click="SerialNormalClass_OnClick" />
+                    <Button Content="枚举类" Click="SerialClassWithEnum_OnClick" />
+                    <Button Content="字典" Click="SerialDictionary_OnClick" />
+                    <Button Content="复杂类" Click="SerialClassWithDict_OnClick" />
+                    <SelectableTextBlock Name="TxtJsonStr" TextWrapping="Wrap" />
+                </StackPanel>
+            </ScrollViewer>
         </TabItem>
         <TabItem Header="测试XML序列化">
-            <StackPanel>
-                <Button Content="一般类" Click="SerialClassXml_OnClick" />
-                <SelectableTextBlock Name="TxtXmlStr" TextWrapping="Wrap"/>
-            </StackPanel>
+
+            <ScrollViewer>
+                <StackPanel>
+                    <Button Content="一般类" Click="SerialClassXml_OnClick" />
+                    <SelectableTextBlock Name="TxtXmlStr" TextWrapping="Wrap" />
+                </StackPanel>
+            </ScrollViewer>
         </TabItem>
         <TabItem Header="二维码">
             <StackPanel>
-                <Button Content="生成" Click="GeneratorQrCode_OnClick"/> 
+                <Button Content="生成" Click="GeneratorQrCode_OnClick" />
             </StackPanel>
         </TabItem>
     </TabControl>

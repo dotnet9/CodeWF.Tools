@@ -3,11 +3,29 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using YamlDotNet.System.Text.Json;
 
 namespace CodeWF.Tools.Extensions;
+public class NullableDateTimeConverter : JsonConverter<DateTime?>
+{
+    public override DateTime? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Null)
+            return null;
 
+        return reader.GetDateTime();
+    }
+
+    public override void Write(Utf8JsonWriter writer, DateTime? value, JsonSerializerOptions options)
+    {
+        if (value.HasValue)
+            writer.WriteStringValue(value.Value);
+        else
+            writer.WriteNullValue();
+    }
+}
 public static class JsonExtensions
 {
     public static bool ToJson<T>(this T obj, out string? json, out string? errorMsg)
@@ -53,7 +71,8 @@ public static class JsonExtensions
             var options = new JsonSerializerOptions()
             {
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+                TypeInfoResolver = new DefaultJsonTypeInfoResolver(),
+                Converters = { new NullableDateTimeConverter() }
             };
             obj = JsonSerializer.Deserialize<T>(json!, options);
             errorMsg = default;

@@ -397,3 +397,4 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 Output/
+src/CodeWF.Tools.Files/Extensions/JsonExtensions.cs

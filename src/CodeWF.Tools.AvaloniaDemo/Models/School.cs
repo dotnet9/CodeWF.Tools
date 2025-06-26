@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CodeWF.Tools.AvaloniaDemo.Models;
 
@@ -18,6 +19,7 @@ public static class School
                 Name = "Software Engineer",
                 Record = 100
             },
+            CreateTime = DateTime.Now
         };
         student.Projects = new List<Project>();
         for (var i = 0; i < 10; i++)

@@ -133,6 +133,9 @@ public partial class MainView : UserControl
     {
         var data = School.ManualMockStudent();
         TxtJsonStr.Text = data.ToJson(out var json, out var errorMsg) ? json : $"序列化异常：{errorMsg}";
+
+        json.FromJson<Student>(out var desObj, out errorMsg);
+        TxtJsonStr.Text += $"反序列化后时间：{desObj?.CreateTime}";
     }
 
     private void SerialClassXml_OnClick(object? sender, RoutedEventArgs e)
