@@ -10,6 +10,8 @@ public class Student
 
     public string[]? Tags { get; set; }
 
+    public DateTime BirthDate { get; set; }
+
     public Project? MainProject { get; set; }
 
     public List<Project>? Projects { get; set; }
