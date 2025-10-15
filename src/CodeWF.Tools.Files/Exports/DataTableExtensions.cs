@@ -12,12 +12,12 @@ namespace CodeWF.Tools.Exports;
 
 public static class DataTableExtensions
 {
-    public static bool Export(this DataTable dataTable, string saveFilePath, out string errorMsg,
+    public static bool Export(this DataTable dataTable, string saveFilePath, Encoding encoding, out string errorMsg,
         bool containColumnHeader = true)
     {
         if (saveFilePath.ToLower().EndsWith(".csv"))
         {
-            return dataTable.ExportToCsv(saveFilePath, out errorMsg, containColumnHeader);
+            return dataTable.ExportToCsv(saveFilePath, encoding, out errorMsg, containColumnHeader);
         }
 
         if (saveFilePath.ToLower().EndsWith(".xlsx"))
@@ -29,13 +29,13 @@ public static class DataTableExtensions
     }
 
 
-    public static bool ExportToCsv(this DataTable dataTable, string saveFilePath, out string errorMsg,
+    public static bool ExportToCsv(this DataTable dataTable, string saveFilePath, Encoding encoding, out string errorMsg,
         bool containColumnHeader = true)
     {
         errorMsg = "";
         try
         {
-            using var writer = new StreamWriter(saveFilePath, false, Encoding.Default);
+            using var writer = new StreamWriter(saveFilePath, false, encoding);
             using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
 
             if (containColumnHeader)
