@@ -1,6 +1,7 @@
 ﻿using CodeWF.Tools.Exports;
 using CodeWF.Tools.FileExtensions;
 using System.Data;
+using System.Text;
 using DataTableExtensions = CodeWF.Tools.Exports.DataTableExtensions;
 
 namespace CodeWF.Tools.Test;
@@ -15,7 +16,7 @@ public class ExportTest
         Assert.False(File.Exists(file));
 
         var data = GetData();
-        data.Export(file, out var errorMsg);
+        data.Export(file, Encoding.Default,  out var errorMsg);
         Assert.True(File.Exists(file));
 
         var importResult = DataTableExtensions.Import(file, out errorMsg, out var newData);
@@ -33,7 +34,7 @@ public class ExportTest
         Assert.False(File.Exists(file));
 
         var data = GetData();
-        data.Export(file, out var errorMsg);
+        data.Export(file, Encoding.Default,  out var errorMsg);
         Assert.True(File.Exists(file));
 
         var importResult = DataTableExtensions.Import(file, out errorMsg, out var newData);
