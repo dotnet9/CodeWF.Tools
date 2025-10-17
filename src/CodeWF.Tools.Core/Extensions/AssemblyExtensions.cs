@@ -94,11 +94,24 @@ public static class AssemblyExtensions
     public static DateTime? CompileTime(this Assembly? assembly)
     {
         var exePath = Process.GetCurrentProcess()?.MainModule?.FileName;
-        if (!string.IsNullOrWhiteSpace(exePath) && File.Exists(exePath))
+        if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
         {
-            return new FileInfo(exePath).LastWriteTime;
+            return default;
+        }
+        
+        const int PeHeaderOffset = 60;
+        const int LinkerTimestampOffset = 8;
+        const int ReadCount = 2048;
+        var buffer = new byte[ReadCount];
+        using (var s = new FileStream(exePath, FileMode.Open, FileAccess.Read))
+        {
+            s.Read(buffer, 0, ReadCount);
         }
 
-        return default;
+        var i = BitConverter.ToInt32(buffer, PeHeaderOffset);
+        var secondsSince1970 = BitConverter.ToInt32(buffer, i + LinkerTimestampOffset);
+        var dt = new DateTime(1970, 1, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        dt = dt.AddSeconds(secondsSince1970);
+        return dt.ToLocalTime();
     }
 }
