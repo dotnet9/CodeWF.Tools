@@ -110,7 +110,7 @@ public static class AssemblyExtensions
 
         var i = BitConverter.ToInt32(buffer, PeHeaderOffset);
         var secondsSince1970 = BitConverter.ToInt32(buffer, i + LinkerTimestampOffset);
-        var dt = new DateTime(1970, 1, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var dt = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         dt = dt.AddSeconds(secondsSince1970);
         return dt.ToLocalTime();
     }
