@@ -38,6 +38,21 @@ public static class AppConfigHelper
         }
     }
 
+    public static bool TryGetOrSet<T>(string name,out T? value, T? defaultValue = default)
+    {
+        var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+        if (config.TryGet(name, out value))
+        {
+            return true;
+        }
+        else
+        {
+            config.SetOrAdd(name, defaultValue);
+            value = defaultValue;
+            return false;
+        }
+    }
+
 
     public static bool TryGet<T>(string name, out T? value)
     {

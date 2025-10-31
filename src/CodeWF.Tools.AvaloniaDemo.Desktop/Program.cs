@@ -1,6 +1,6 @@
 ﻿using Avalonia;
-using Avalonia.ReactiveUI;
 using CodeWF.Tools.AvaloniaDemo.Models;
+using ReactiveUI.Avalonia;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
