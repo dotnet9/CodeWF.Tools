@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace CodeWF.Tools.Extensions
@@ -468,43 +469,74 @@ namespace CodeWF.Tools.Extensions
         /// <param name="beginTime">开始时间</param>
         /// <param name="endTime">结束时间</param>
         /// <returns>时间差</returns>
-        public static string GetDiffTime(this in DateTime beginTime, in DateTime endTime)
+        public static string GetDiffTime(this DateTime beginTime, DateTime endTime)
         {
-            string strResout = string.Empty;
-
-            //获得2时间的时间间隔秒计算
-            TimeSpan span = endTime.Subtract(beginTime);
-            if (span.Days >= 365)
+            // 处理时间顺序
+            if (endTime < beginTime)
             {
-                strResout += span.Days / 365 + "年";
+                var temp = beginTime;
+                beginTime = endTime;
+                endTime = temp;
             }
 
-            if (span.Days >= 30)
+            // 如果时间差为0
+            if (beginTime == endTime)
+                return "0秒";
+
+            var result = new List<string>();
+            var current = beginTime;
+
+            // 计算年
+            int years = endTime.Year - current.Year;
+            if (endTime.Month < current.Month || (endTime.Month == current.Month && endTime.Day < current.Day))
             {
-                strResout += span.Days % 365 / 30 + "个月";
+                years--;
             }
 
-            if (span.Days >= 1)
+            if (years > 0)
             {
-                strResout += (int)(span.TotalDays % 30.42) + "天";
+                result.Add($"{years}年");
+                current = current.AddYears(years);
             }
 
-            if (span.Hours >= 1)
+            // 计算月
+            int months = endTime.Month - current.Month;
+            if (months < 0)
             {
-                strResout += span.Hours + "小时";
+                months += 12;
+            }
+            if (endTime.Day < current.Day)
+            {
+                months--;
             }
 
-            if (span.Minutes >= 1)
+            if (months > 0)
             {
-                strResout += span.Minutes + "分钟";
+                result.Add($"{months}个月");
+                current = current.AddMonths(months);
             }
 
-            if (span.Seconds >= 1)
+            // 计算剩余的时间
+            var remaining = endTime - current;
+
+            if (remaining.Days > 0)
             {
-                strResout += span.Seconds + "秒";
+                result.Add($"{remaining.Days}天");
+            }
+            if (remaining.Hours > 0)
+            {
+                result.Add($"{remaining.Hours}小时");
+            }
+            if (remaining.Minutes > 0)
+            {
+                result.Add($"{remaining.Minutes}分钟");
+            }
+            if (remaining.Seconds > 0 || result.Count == 0)
+            {
+                result.Add($"{remaining.Seconds}秒");
             }
 
-            return strResout;
+            return string.Join("", result);
         }
 
         #region 时间转换核心方法
