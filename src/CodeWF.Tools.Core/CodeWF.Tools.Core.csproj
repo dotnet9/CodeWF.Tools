@@ -36,6 +36,6 @@
 		<None Include="..\..\logo.ico" Pack="true" PackagePath="" />
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="System.Text.Encoding.CodePages" Version="10.0.0-rc.2.25502.107" />
+	  <PackageReference Include="System.Text.Encoding.CodePages" Version="10.0.0" />
 	</ItemGroup>
 </Project>
