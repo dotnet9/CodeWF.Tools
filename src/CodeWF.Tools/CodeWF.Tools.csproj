@@ -30,14 +30,14 @@
 		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="CodeWF.Tools.Core" Version="1.3.8.8" />
-		<PackageReference Include="CodeWF.Tools.Files" Version="1.3.8.8" />
-		<PackageReference Include="CodeWF.Tools.Image" Version="1.3.8.8" />
-	</ItemGroup>
-	<ItemGroup>
 		<!-- The nuget package icon -->
 		<None Include="..\..\README.md" Pack="true" PackagePath="" />
 		<None Include="..\..\logo.png" Pack="true" PackagePath="" />
 		<None Include="..\..\logo.ico" Pack="true" PackagePath="" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\CodeWF.Tools.Core\CodeWF.Tools.Core.csproj" />
+	  <ProjectReference Include="..\CodeWF.Tools.Files\CodeWF.Tools.Files.csproj" />
+	  <ProjectReference Include="..\CodeWF.Tools.Image\CodeWF.Tools.Image.csproj" />
 	</ItemGroup>
 </Project>
