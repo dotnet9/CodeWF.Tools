@@ -28,7 +28,7 @@ public class NullableDateTimeConverter : JsonConverter<DateTime?>
 }
 public static class JsonExtensions
 {
-    public static bool ToJson<T>(this T obj, out string? json, out string? errorMsg)
+    public static bool ToJson<T>(this T obj, JsonSerializerOptions? options,  out string? json, out string? errorMsg)
     {
         if (obj == null)
         {
@@ -37,12 +37,16 @@ public static class JsonExtensions
             return false;
         }
 
-        var options = new JsonSerializerOptions()
+        if (options == null)
         {
-            WriteIndented = true,
-            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-            TypeInfoResolver = new DefaultJsonTypeInfoResolver(),
-        };
+            options = new JsonSerializerOptions()
+            {
+                WriteIndented = true,
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                TypeInfoResolver = new DefaultJsonTypeInfoResolver(),
+            };
+        }
+
         try
         {
             json = JsonSerializer.Serialize(obj, options);
@@ -57,7 +61,7 @@ public static class JsonExtensions
         }
     }
 
-    public static bool FromJson<T>(this string? json, out T? obj, out string? errorMsg)
+    public static bool FromJson<T>(this string? json, JsonSerializerOptions? options, out T? obj, out string? errorMsg)
     {
         if (string.IsNullOrWhiteSpace(json))
         {
@@ -68,12 +72,16 @@ public static class JsonExtensions
 
         try
         {
-            var options = new JsonSerializerOptions()
+            if (options == null)
             {
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                TypeInfoResolver = new DefaultJsonTypeInfoResolver(),
-                Converters = { new NullableDateTimeConverter() }
-            };
+                options = new JsonSerializerOptions()
+                {
+                    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                    TypeInfoResolver = new DefaultJsonTypeInfoResolver(),
+                    Converters = { new NullableDateTimeConverter() }
+                };
+            }
+
             obj = JsonSerializer.Deserialize<T>(json!, options);
             errorMsg = default;
             return true;

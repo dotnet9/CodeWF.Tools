@@ -15,7 +15,7 @@ public static class School
             Tags = new[] { "Math", "Science", "History", "Art", "Computer Science" },
             MainProject = new Project
             {
-                Id = "Math",
+                Id = 1,
                 Name = "Software Engineer",
                 Record = 100
             },
@@ -26,7 +26,7 @@ public static class School
         {
             student.Projects.Add(new Project
             {
-                Id = "Math",
+                Id = i,
                 Name = "Software Engineer",
                 Record = 100
             });

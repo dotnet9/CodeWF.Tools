@@ -30,7 +30,7 @@
 		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.9.1" />
+		<PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.10.2" />
 		<PackageReference Include="ZXing.Net.Bindings.Magick" Version="0.16.17" />
 	</ItemGroup>
 	<ItemGroup>

@@ -30,12 +30,12 @@
 		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="SharpCompress" Version="0.41.0" />
-		<PackageReference Include="System.Text.Json" Version="10.0.0" />
-		<PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.0" />
+		<PackageReference Include="SharpCompress" Version="0.45.0-beta.352" />
+		<PackageReference Include="System.Text.Json" Version="10.0.2" />
+		<PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.2" />
 		<PackageReference Include="YamlDotNet.System.Text.Json" Version="1.7.1" />
 		<PackageReference Include="CsvHelper" Version="33.1.0" />
-		<PackageReference Include="MiniExcel" Version="2.0.0-preview.1" />
+		<PackageReference Include="MiniExcel" Version="2.0.0-preview.2" />
 	</ItemGroup>
 	<ItemGroup>
 		<!-- The nuget package icon -->

@@ -53,7 +53,7 @@ public enum Gender
 
 public class Project
 {
-    public string Id { get; set; }
+    public int? Id { get; set; }
 
     public string Name { get; set; }
 
@@ -62,6 +62,11 @@ public class Project
     [XmlArray(ElementName = "Members")]
     [XmlArrayItem(typeof(Member))]
     public List<Member> Members { get; set; }
+}
+
+[JsonSerializable(typeof(Project))]
+internal partial class ProjectJsonSerializerContext : JsonSerializerContext
+{
 }
 
 public class Member

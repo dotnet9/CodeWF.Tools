@@ -76,7 +76,7 @@ public class SevenZipCompressor : ISevenZipCompressor
     /// <returns></returns>
     private IWritableArchive CreateZipArchive(IEnumerable<string> files, string rootDir, ArchiveType archiveType)
     {
-        var archive = ArchiveFactory.Create(archiveType);
+        var archive = ArchiveFactory.CreateArchive(archiveType);
         var dic = GetFileEntryMaps(files);
         foreach (var pair in dic)
         {
