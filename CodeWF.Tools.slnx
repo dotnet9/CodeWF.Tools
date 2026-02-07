@@ -1,0 +1,40 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="logo.png" />
+    <File Path="README-zh_CN.md" />
+    <File Path="README.md" />
+    <File Path="UpdateLog.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/CodeWF.Tools.Core/CodeWF.Tools.Core.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+    <Project Path="src/CodeWF.Tools.Files/CodeWF.Tools.Files.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+    <Project Path="src/CodeWF.Tools.Image/CodeWF.Tools.Image.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+    <Project Path="src/CodeWF.Tools/CodeWF.Tools.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="src/CodeWF.Tools.AvaloniaDemo.Desktop/CodeWF.Tools.AvaloniaDemo.Desktop.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+    <Project Path="src/CodeWF.Tools.AvaloniaDemo/CodeWF.Tools.AvaloniaDemo.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+    <Project Path="src/CodeWF.Tools.Core.Test/CodeWF.Tools.Core.Test.csproj" />
+    <Project Path="src/CodeWF.Tools.Test/CodeWF.Tools.Test.csproj">
+      <Platform Solution="*|x64" Project="x64" />
+    </Project>
+  </Folder>
+</Solution>
