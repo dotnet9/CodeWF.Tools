@@ -133,7 +133,7 @@ public static class YamlExtensions
         try
         {
             if (yamlString.FromYaml(out var newObj, out errorMsg)
-                && newObj.ToJson(options: null, out jsonString, out errorMsg))
+                && newObj.ToJson(out jsonString, out errorMsg))
             {
                 return true;
             }

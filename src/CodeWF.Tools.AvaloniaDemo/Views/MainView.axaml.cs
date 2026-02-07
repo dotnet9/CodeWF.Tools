@@ -58,7 +58,7 @@ public partial class MainView : UserControl
     {
         var obj = School.ManualMockStudent();
 
-        obj.ToJson(options: null, out var jsonString, out var errorMsg);
+        obj.ToJson(out var jsonString, out var errorMsg);
         jsonString.JsonToYaml(out var yamlString, out errorMsg);
     }
 
@@ -80,7 +80,7 @@ public partial class MainView : UserControl
             new("红色", 1.0, "马克笔", false),
             new("绿色", 0.3, "钢笔", true),
         ];
-        TxtJsonStr.Text = data.ToJson(options: null, out var json, out var errorMsg) ? json : $"序列化异常：{errorMsg}";
+        TxtJsonStr.Text = data.ToJson(out var json, out var errorMsg) ? json : $"序列化异常：{errorMsg}";
     }
 
     private void SerialNormalClass_OnClick(object? sender, RoutedEventArgs e)
@@ -91,7 +91,7 @@ public partial class MainView : UserControl
             new Project() { Id = null, Name = "n1", Record = 1 },
             new Project() { Id = 3, Name = "n1", Record = 1 }
         };
-        if (data.ToJson(options: null, out var json, out var errorMsg))
+        if (data.ToJson(out var json, out var errorMsg))
         {
             TxtJsonStr.Text = json;
         }
@@ -108,7 +108,7 @@ public partial class MainView : UserControl
             new ClassWithEnum() { Id = 1, Name = "N1", Type = TestEnum.Dark },
             new ClassWithEnum() { Id = 1, Name = "N1", Type = TestEnum.Light }
         };
-        if (data.ToJson(options: null, out var json, out var errorMsg))
+        if (data.ToJson(out var json, out var errorMsg))
         {
             TxtJsonStr.Text = json;
         }
@@ -138,9 +138,9 @@ public partial class MainView : UserControl
     private void SerialClassWithDict_OnClick(object? sender, RoutedEventArgs e)
     {
         var data = School.ManualMockStudent();
-        TxtJsonStr.Text = data.ToJson(options: null, out var json, out var errorMsg) ? json : $"序列化异常：{errorMsg}";
+        TxtJsonStr.Text = data.ToJson(out var json, out var errorMsg) ? json : $"序列化异常：{errorMsg}";
 
-        json.FromJson<Student>(options: null, out var desObj, out errorMsg);
+        json.FromJson<Student>(out var desObj, out errorMsg);
         TxtJsonStr.Text += $"反序列化后时间：{desObj?.CreateTime}";
     }
 

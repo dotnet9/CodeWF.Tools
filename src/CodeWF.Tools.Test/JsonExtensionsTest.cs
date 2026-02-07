@@ -9,9 +9,9 @@ public class JsonExtensionsTest
     {
         var obj = School.GetStudent();
 
-        Assert.True(obj.ToJson(options: null, out var jsonString, out var errorMsg));
+        Assert.True(obj.ToJson(out var jsonString, out var errorMsg));
 
-        Assert.True(jsonString.FromJson<Student>(options: null, out var newObj, out errorMsg));
+        Assert.True(jsonString.FromJson<Student>(out var newObj, out errorMsg));
     }
 
 
@@ -20,7 +20,7 @@ public class JsonExtensionsTest
     {
         var obj = School.GetStudent();
 
-        Assert.True(obj.ToJson(options: null, out var jsonString, out var errorMsg));
+        Assert.True(obj.ToJson(out var jsonString, out var errorMsg));
         Assert.True(jsonString.JsonToYaml(out var yamlString, out errorMsg));
     }
 
@@ -32,9 +32,9 @@ public class JsonExtensionsTest
         table1["you"] = 2;
         table1[2] = "and me";
 
-        table1.ToJson(options: null, out var json, out var errorMsg);
+        table1.ToJson(out var json, out var errorMsg);
 
-        var convertResult = json.FromJson(options: null, out Hashtable table2, out errorMsg);
+        var convertResult = json.FromJson(out Hashtable table2, out errorMsg);
 
         Assert.True(convertResult);
         Assert.Equal(table1.Count, table2.Count);

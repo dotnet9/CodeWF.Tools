@@ -28,7 +28,7 @@ public class NullableDateTimeConverter : JsonConverter<DateTime?>
 }
 public static class JsonExtensions
 {
-    public static bool ToJson<T>(this T obj, JsonSerializerOptions? options,  out string? json, out string? errorMsg)
+    public static bool ToJson<T>(this T obj,  out string? json, out string? errorMsg, JsonSerializerOptions? options = null)
     {
         if (obj == null)
         {
@@ -61,7 +61,7 @@ public static class JsonExtensions
         }
     }
 
-    public static bool FromJson<T>(this string? json, JsonSerializerOptions? options, out T? obj, out string? errorMsg)
+    public static bool FromJson<T>(this string? json, out T? obj, out string? errorMsg, JsonSerializerOptions? options = null )
     {
         if (string.IsNullOrWhiteSpace(json))
         {
