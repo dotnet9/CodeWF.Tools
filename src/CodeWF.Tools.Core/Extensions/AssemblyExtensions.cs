@@ -159,7 +159,31 @@ public static class AssemblyExtensions
     {
         try
         {
-            // ELF 文件格式：读取文件头中的时间戳
+            // 首先尝试使用 ELF 文件头获取时间戳
+            var elfTime = GetElfTimestamp(exePath);
+            if (elfTime.HasValue)
+            {
+                // 验证时间戳是否合理（不是1970年）
+                if (elfTime.Value.Year > 1970)
+                {
+                    return elfTime;
+                }
+            }
+
+            // 如果 ELF 方法失败，尝试使用文件修改时间作为备选方案
+            return GetFileModificationTime(exePath);
+        }
+        catch
+        {
+            // 如果读取失败，返回默认值
+            return default;
+        }
+    }
+
+    private static DateTime? GetElfTimestamp(string exePath)
+    {
+        try
+        {
             const int ElfHeaderSize = 64;
             var buffer = new byte[ElfHeaderSize];
             using (var s = new FileStream(exePath, FileMode.Open, FileAccess.Read))
@@ -177,13 +201,33 @@ public static class AssemblyExtensions
 
             // 读取时间戳（从文件开始偏移 8 字节处）
             var secondsSince1970 = BitConverter.ToInt32(buffer, 8);
+            
+            // 检查是否为大端字节序
+            if (BitConverter.IsLittleEndian)
+            {
+                // 转换为小端字节序
+                secondsSince1970 = System.Net.IPAddress.NetworkToHostOrder(secondsSince1970);
+            }
+            
             var dt = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             dt = dt.AddSeconds(secondsSince1970);
             return dt.ToLocalTime();
         }
         catch
         {
-            // 如果读取失败，返回默认值
+            return default;
+        }
+    }
+
+    private static DateTime? GetFileModificationTime(string exePath)
+    {
+        try
+        {
+            var fileInfo = new FileInfo(exePath);
+            return fileInfo.LastWriteTime;
+        }
+        catch
+        {
             return default;
         }
     }
