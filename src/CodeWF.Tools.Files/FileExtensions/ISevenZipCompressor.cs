@@ -1,5 +1,4 @@
-﻿using SharpCompress.Common;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace CodeWF.Tools.FileExtensions;
 
@@ -13,23 +12,22 @@ public interface ISevenZipCompressor
     /// </summary>
     /// <param name="compressedFile">rar文件</param>
     /// <param name="dir">解压到...</param>
-    void Decompress(string compressedFile, string dir = "");
+    /// <param name="ignoreEmptyDir">忽略空文件夹</param>
+    void Decompress(string compressedFile, string dir = "", bool ignoreEmptyDir = true);
 
     /// <summary>
     /// 压缩多个文件
     /// </summary>
     /// <param name="files">多个文件路径，文件或文件夹</param>
     /// <param name="zipFile">压缩到...</param>
-    /// <param name="rootDir">压缩包内部根文件夹</param>
-    /// <param name="archiveType"></param>
-    void Zip(IEnumerable<string> files, string zipFile, string rootDir = "", ArchiveType archiveType = ArchiveType.Zip);
+    /// <param name="rootdir">压缩包内部根文件夹</param>
+    void Zip(IEnumerable<string> files, string zipFile, string rootdir = "");
 
     /// <summary>
     /// 压缩文件夹
     /// </summary>
     /// <param name="dir">文件夹</param>
     /// <param name="zipFile">压缩到...</param>
-    /// <param name="rootDir">压缩包内部根文件夹</param>
-    /// <param name="archiveType"></param>
-    public void Zip(string dir, string zipFile, string rootDir = "", ArchiveType archiveType = ArchiveType.Zip);
+    /// <param name="rootdir">压缩包内部根文件夹</param>
+    public void Zip(string dir, string zipFile, string rootdir = "");
 }

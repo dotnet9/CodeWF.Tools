@@ -30,7 +30,7 @@
 		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="SharpCompress" Version="0.45.0-beta.352" />
+		<PackageReference Include="SharpCompress" Version="0.46.4" />
 		<PackageReference Include="System.Text.Json" Version="10.0.2" />
 		<PackageReference Include="System.Configuration.ConfigurationManager" Version="10.0.2" />
 		<PackageReference Include="YamlDotNet.System.Text.Json" Version="1.7.1" />

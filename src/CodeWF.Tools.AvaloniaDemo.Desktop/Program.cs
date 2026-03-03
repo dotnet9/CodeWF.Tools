@@ -1,5 +1,5 @@
 ﻿using Avalonia;
-using Avalonia.ReactiveUI;
+using ReactiveUI.Avalonia;
 using CodeWF.Tools.AvaloniaDemo.Models;
 using System;
 using System.Collections.Generic;
@@ -30,5 +30,8 @@ class Program
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace()
-            .UseReactiveUI();
+            .UseReactiveUI(options => 
+            {
+            
+            });
 }
