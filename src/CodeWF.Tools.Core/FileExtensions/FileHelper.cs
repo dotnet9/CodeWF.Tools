@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -26,34 +28,100 @@ public static class FileHelper
         }
     }
 
+    /// <summary>
+    /// 跨平台打开文件夹并选中指定文件
+    /// </summary>
+    /// <param name="fileFullName">文件的完整路径</param>
+    /// <exception cref="FileNotFoundException">文件不存在时抛出</exception>
     public static void OpenFolderAndSelectFile(string fileFullName)
     {
-        var path = fileFullName;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        // 校验文件是否存在
+        if (!File.Exists(fileFullName))
         {
-            path = fileFullName.Replace("/", "\\");
+            throw new FileNotFoundException("The specified file does not exist", fileFullName);
         }
 
-        var psi = new System.Diagnostics.ProcessStartInfo("Explorer.exe")
+        string normalizedPath = NormalizePath(fileFullName);
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            Arguments = $"/e,/select,\"{path}\""
-        };
-        System.Diagnostics.Process.Start(psi);
+            // Windows 逻辑：调用Explorer并选中文件
+            var psi = new ProcessStartInfo("Explorer.exe")
+            {
+                Arguments = $"/e,/select,\"{normalizedPath}\""
+            };
+            Process.Start(psi);
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            // Linux 逻辑：根据桌面环境调用对应文件管理器
+            OpenLinuxFolderAndSelectFile(normalizedPath);
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            // macOS 逻辑：使用open -R选中文件
+            var psi = new ProcessStartInfo("open")
+            {
+                Arguments = $"-R \"{normalizedPath}\"",
+                UseShellExecute = false
+            };
+            Process.Start(psi);
+        }
+        else
+        {
+            // 未知系统：兜底打开文件所在目录
+            OpenFolder(Path.GetDirectoryName(normalizedPath));
+        }
     }
 
+    /// <summary>
+    /// 跨平台打开指定文件夹
+    /// </summary>
+    /// <param name="folderFullName">文件夹的完整路径</param>
+    /// <exception cref="DirectoryNotFoundException">文件夹不存在时抛出</exception>
     public static void OpenFolder(string folderFullName)
     {
-        var path = folderFullName;
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        // 校验文件夹是否存在
+        if (!Directory.Exists(folderFullName))
         {
-            path = folderFullName.Replace("/", "\\");
+            throw new DirectoryNotFoundException("The specified folder does not exist：" + folderFullName);
         }
 
-        var psi = new System.Diagnostics.ProcessStartInfo("Explorer.exe")
+        string normalizedPath = NormalizePath(folderFullName);
+
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            Arguments = path
-        };
-        System.Diagnostics.Process.Start(psi);
+            // Windows 逻辑：调用Explorer打开文件夹
+            var psi = new ProcessStartInfo("Explorer.exe")
+            {
+                Arguments = normalizedPath
+            };
+            Process.Start(psi);
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            // Linux 逻辑：通用xdg-open打开文件夹
+            var psi = new ProcessStartInfo("xdg-open")
+            {
+                Arguments = $"\"{normalizedPath}\"",
+                UseShellExecute = false
+            };
+            Process.Start(psi);
+        }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            // macOS 逻辑：使用open打开文件夹
+            var psi = new ProcessStartInfo("open")
+            {
+                Arguments = $"\"{normalizedPath}\"",
+                UseShellExecute = false
+            };
+            Process.Start(psi);
+        }
+        else
+        {
+            throw new PlatformNotSupportedException("The current operating system does not support this operation");
+        }
     }
 
     public static void CreateFolderIfNotExist(string folderFullPath)
@@ -145,4 +213,92 @@ public static class FileHelper
         // 都失败了，返回默认编码
         return Encoding.Default;
     }
+
+    #region 私有辅助方法
+
+    /// <summary>
+    /// 标准化路径（处理不同系统的路径分隔符）
+    /// </summary>
+    /// <param name="path">原始路径</param>
+    /// <returns>标准化后的路径</returns>
+    private static string NormalizePath(string path)
+    {
+        if (string.IsNullOrEmpty(path))
+        {
+            return path;
+        }
+
+        // 统一处理路径分隔符，再转换为当前系统的标准格式
+        var unifiedPath = path.Replace('\\', Path.DirectorySeparatorChar)
+            .Replace('/', Path.DirectorySeparatorChar);
+        return Path.GetFullPath(unifiedPath);
+    }
+
+    /// <summary>
+    /// Linux下打开文件夹并选中文件（适配主流桌面环境）
+    /// </summary>
+    /// <param name="filePath">文件完整路径</param>
+    private static void OpenLinuxFolderAndSelectFile(string filePath)
+    {
+        var desktopEnv = Environment.GetEnvironmentVariable("XDG_CURRENT_DESKTOP")?.ToLower() ?? "";
+        var (fileManager, args) = GetLinuxFileManagerArgs(desktopEnv, filePath);
+
+        try
+        {
+            var psi = new ProcessStartInfo(fileManager, args)
+            {
+                UseShellExecute = false
+            };
+            Process.Start(psi);
+        }
+        catch (Exception)
+        {
+            // 兜底：仅打开文件所在目录
+            OpenFolder(Path.GetDirectoryName(filePath));
+        }
+    }
+
+    /// <summary>
+    /// 根据Linux桌面环境获取文件管理器及参数
+    /// </summary>
+    /// <param name="desktopEnv">桌面环境标识</param>
+    /// <param name="filePath">文件完整路径</param>
+    /// <returns>（文件管理器命令，参数）</returns>
+    private static (string, string) GetLinuxFileManagerArgs(string desktopEnv, string filePath)
+    {
+        if (desktopEnv.Contains("gnome") || desktopEnv.Contains("unity"))
+        {
+            // GNOME/Unity - Nautilus
+            return ("nautilus", $"--select \"{filePath}\"");
+        }
+
+        if (desktopEnv.Contains("kde"))
+        {
+            // KDE - Dolphin
+            return ("dolphin", $"--select \"{filePath}\"");
+        }
+
+        if (desktopEnv.Contains("xfce"))
+        {
+            // XFCE - Thunar
+            return ("thunar", $"--select \"{filePath}\"");
+        }
+
+        if (desktopEnv.Contains("mate"))
+        {
+            // MATE - Caja
+            return ("caja", $"--select \"{filePath}\"");
+        }
+
+        if (desktopEnv.Contains("lxqt"))
+        {
+            // LXQT - PCManFM-Qt
+            return ("pcmanfm-qt", $"--select \"{filePath}\"");
+        }
+
+        // 未知桌面环境：仅打开目录
+        return ("xdg-open", $"\"{Path.GetDirectoryName(filePath)}\"");
+    }
+
+    #endregion
 }
