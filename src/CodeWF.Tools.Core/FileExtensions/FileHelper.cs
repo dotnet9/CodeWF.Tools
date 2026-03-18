@@ -41,7 +41,7 @@ public static class FileHelper
             throw new FileNotFoundException("The specified file does not exist", fileFullName);
         }
 
-        string normalizedPath = NormalizePath(fileFullName);
+        string normalizedPath = NormalizePathSeparators(fileFullName);
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
@@ -87,7 +87,7 @@ public static class FileHelper
             throw new DirectoryNotFoundException("The specified folder does not exist：" + folderFullName);
         }
 
-        string normalizedPath = NormalizePath(folderFullName);
+        string normalizedPath = NormalizePathSeparators(folderFullName);
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
@@ -214,26 +214,38 @@ public static class FileHelper
         return Encoding.Default;
     }
 
-    #region 私有辅助方法
-
     /// <summary>
-    /// 标准化路径（处理不同系统的路径分隔符）
+    /// 纯手工替换路径分隔符为当前系统标准分隔符（不校验路径是否存在、不解析绝对路径）
     /// </summary>
-    /// <param name="path">原始路径</param>
-    /// <returns>标准化后的路径</returns>
-    private static string NormalizePath(string path)
+    /// <param name="inputPath">原始路径（可混写/、\）</param>
+    /// <returns>标准化分隔符的路径（保持相对/绝对路径格式）</returns>
+    /// <exception cref="ArgumentNullException">输入为空时抛出</exception>
+    public static string NormalizePathSeparators(string inputPath)
     {
-        if (string.IsNullOrEmpty(path))
+        // 基础校验：仅判空，不做其他校验
+        if (string.IsNullOrWhiteSpace(inputPath))
         {
-            return path;
+            throw new ArgumentNullException(nameof(inputPath), "输入路径不能为空或仅包含空白字符");
         }
 
-        // 统一处理路径分隔符，再转换为当前系统的标准格式
-        var unifiedPath = path.Replace('\\', Path.DirectorySeparatorChar)
-            .Replace('/', Path.DirectorySeparatorChar);
-        return Path.GetFullPath(unifiedPath);
+        // 1. 获取当前系统的标准分隔符
+        var targetSeparator = Path.DirectorySeparatorChar;
+        // 2. 定义需要替换的「非标准分隔符」
+        var sourceSeparator = targetSeparator == '\\' ? '/' : '\\';
+
+        // 3. 纯字符串替换：将所有非标准分隔符换成系统标准分隔符
+        var normalizedPath = inputPath.Replace(sourceSeparator, targetSeparator);
+
+        // 可选：清理连续的重复分隔符（比如 "home//user" → "home/user"）
+        normalizedPath = CleanDuplicateSeparators(normalizedPath, targetSeparator);
+
+        return normalizedPath;
     }
 
+
+
+    #region 私有辅助方法
+    
     /// <summary>
     /// Linux下打开文件夹并选中文件（适配主流桌面环境）
     /// </summary>
@@ -298,6 +310,38 @@ public static class FileHelper
 
         // 未知桌面环境：仅打开目录
         return ("xdg-open", $"\"{Path.GetDirectoryName(filePath)}\"");
+    }
+
+    /// <summary>
+    /// 辅助方法：清理路径中连续的重复分隔符
+    /// </summary>
+    private static string CleanDuplicateSeparators(string path, char separator)
+    {
+        if (string.IsNullOrEmpty(path)) return path;
+
+        // 用 StringBuilder 高效处理字符串拼接
+        var sb = new System.Text.StringBuilder();
+        var lastWasSeparator = false;
+
+        foreach (char c in path)
+        {
+            if (c == separator)
+            {
+                if (!lastWasSeparator)
+                {
+                    sb.Append(c);
+                    lastWasSeparator = true;
+                }
+                // 跳过连续的分隔符
+            }
+            else
+            {
+                sb.Append(c);
+                lastWasSeparator = false;
+            }
+        }
+
+        return sb.ToString();
     }
 
     #endregion
