@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CodeWF.Tools.FileExtensions;
 
@@ -19,12 +20,123 @@ public static class FileHelper
         var fn = Path.Combine(cacheDirFullPath, Path.GetRandomFileName());
         return fn;
     }
-
-    public static void DeleteFileIfExist(string filePath)
+    /// <summary>
+    /// 安全读取文件内容（替代 File.ReadAllTextAsync）
+    /// </summary>
+    /// <exception cref="IOException"></exception>
+    /// <exception cref="FileNotFoundException"></exception>
+    public static async Task<string> SafeReadAllTextAsync(string filePath, Encoding encoding = null, int retryCount = 3, int retryDelayMs = 100)
     {
-        if (File.Exists(filePath))
+        encoding ??= Encoding.UTF8;
+        int attempt = 0;
+
+        // 增加重试机制，应对短暂的文件占用
+        while (attempt < retryCount)
         {
-            File.Delete(filePath);
+            try
+            {
+                // 使用 FileStream 手动控制文件访问权限，避免占用
+                using (var fileStream = new FileStream(
+                    filePath,
+                    FileMode.Open,                  // 打开现有文件
+                    FileAccess.Read,                // 仅读取权限
+                    FileShare.ReadWrite | FileShare.Delete, // 允许其他进程读写/删除该文件
+                    4096,                           // 缓冲区大小
+                    FileOptions.Asynchronous))      // 异步操作
+                {
+                    using (var streamReader = new StreamReader(fileStream, encoding))
+                    {
+                        return await streamReader.ReadToEndAsync();
+                    }
+                }
+            }
+            catch (IOException ex) when (ex.HResult == -2147024864) // 文件被占用的HResult值
+            {
+                attempt++;
+                if (attempt >= retryCount)
+                    throw new IOException($"文件 {filePath} 被其他进程占用，重试 {retryCount} 次后仍无法读取", ex);
+
+                await Task.Delay(retryDelayMs); // 等待后重试
+            }
+        }
+
+        throw new FileNotFoundException($"文件 {filePath} 不存在或无法访问", filePath);
+    }
+
+    /// <summary>
+    /// 安全写入文件内容（替代 File.WriteAllTextAsync）
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="IOException"></exception>
+    public static async Task SafeWriteAllTextAsync(string filePath, string content, Encoding encoding = null, int retryCount = 3, int retryDelayMs = 100)
+    {
+        encoding ??= Encoding.UTF8;
+        int attempt = 0;
+
+        while (attempt < retryCount)
+        {
+            try
+            {
+                // 确保目录存在
+                string directory = Path.GetDirectoryName(filePath);
+                if (!Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+
+                // 写入时设置独占访问，写完立即释放
+                using (var fileStream = new FileStream(
+                    filePath,
+                    FileMode.Create,                // 覆盖现有文件（不存在则创建）
+                    FileAccess.Write,               // 仅写入权限
+                    FileShare.None,                 // 写入期间禁止其他进程访问
+                    4096,
+                    FileOptions.Asynchronous))
+                {
+                    using (var streamWriter = new StreamWriter(fileStream, encoding))
+                    {
+                        await streamWriter.WriteAsync(content);
+                    }
+                }
+                return;
+            }
+            catch (IOException ex) when (ex.HResult == -2147024864)
+            {
+                attempt++;
+                if (attempt >= retryCount)
+                    throw new IOException($"文件 {filePath} 被其他进程占用，重试 {retryCount} 次后仍无法写入", ex);
+
+                await Task.Delay(retryDelayMs);
+            }
+        }
+
+        throw new IOException($"无法写入文件 {filePath}，重试 {retryCount} 次后失败");
+    }
+
+    /// <summary>
+    /// 安全删除文件（替代 File.Delete）
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="IOException"></exception>
+    public static async Task DeleteFileIfExist(string filePath, int retryCount = 3, int retryDelayMs = 100)
+    {
+        if (!File.Exists(filePath))
+            return;
+
+        int attempt = 0;
+        while (attempt < retryCount)
+        {
+            try
+            {
+                File.Delete(filePath);
+                return;
+            }
+            catch (IOException ex) when (ex.HResult == -2147024864)
+            {
+                attempt++;
+                if (attempt >= retryCount)
+                    throw new IOException($"文件 {filePath} 被其他进程占用，重试 {retryCount} 次后仍无法删除", ex);
+
+                await Task.Delay(retryDelayMs);
+            }
         }
     }
 
