@@ -9,11 +9,6 @@
     <LangVersion>latest</LangVersion>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <PublishAot>true</PublishAot>
-    <PublishTrimmed>true</PublishTrimmed>
-    <IsTrimmable>true</IsTrimmable>
-    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
-    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   
@@ -28,6 +23,7 @@
     <PackageReference Include="Avalonia.Fonts.Inter" />
     <PackageReference Include="CodeWF.LogViewer.Avalonia" />
     <PackageReference Include="ReactiveUI.Avalonia" />
+	<PackageReference Include="VC-LTL" />
   </ItemGroup>
 
   <ItemGroup>
