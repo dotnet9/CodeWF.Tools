@@ -18,7 +18,7 @@ public class ImageHelperTest
 
         Assert.True(File.Exists(destIconPath));
 
-        FileHelper.DeleteFileIfExist(destIconPath);
+        await FileHelper.DeleteFileIfExist(destIconPath);
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public class ImageHelperTest
 
         foreach (var iconFile in iconFiles)
         {
-            FileHelper.DeleteFileIfExist(iconFile);
+            await FileHelper.DeleteFileIfExist(iconFile);
         }
     }
 }

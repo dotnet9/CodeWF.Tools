@@ -7,8 +7,7 @@ public static class ActionHelper
 {
     public static bool CheckOvertime(Action checkAction, int overtimeMilliseconds = 3000)
     {
-        var task = new Task(checkAction);
-        task.Start();
+        var task = Task.Run(checkAction);
         return task.Wait(TimeSpan.FromMilliseconds(overtimeMilliseconds));
     }
 }

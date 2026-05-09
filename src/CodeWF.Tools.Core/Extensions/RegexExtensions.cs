@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -9,9 +10,9 @@ public static class RegexExtensions
 {
     public static bool IsMatch(this string data, string pattern)
     {
-        if (pattern.Contains(',') || pattern.Contains('，'))
+        var patterns = SplitPatterns(pattern).ToArray();
+        if (patterns.Length > 1)
         {
-            var patterns = pattern.Split([',', '，'], StringSplitOptions.RemoveEmptyEntries);
             return patterns.Any(p => IsMatch(data, p.Trim()));
         }
 
@@ -28,14 +29,11 @@ public static class RegexExtensions
             var currentChar = pattern[i];
             if (currentChar == '\\')
             {
+                converted.Append(Regex.Escape(currentChar.ToString()));
                 if ((i + 1) < pattern.Length)
                 {
-                    converted.Append(pattern[i + 1]);
+                    converted.Append(Regex.Escape(pattern[i + 1].ToString()));
                     i++;
-                }
-                else
-                {
-                    converted.Append(currentChar);
                 }
 
                 continue;
@@ -45,38 +43,146 @@ public static class RegexExtensions
             {
                 case '*':
                 case '%':
-                    if (i == 0 && pattern.Length > 1)
-                    {
-                        var endPattern = pattern.Substring(1);
-                        converted.Append($".*{Regex.Escape(endPattern)}$");
-                        i = pattern.Length;
-                    }
-                    else if (i == pattern.Length - 1 && pattern.Length > 1)
-                    {
-                        var startPattern = pattern.Substring(0, pattern.Length - 1);
-                        converted.Clear();
-                        converted.Append($"^{Regex.Escape(startPattern)}.*");
-                        i = pattern.Length;
-                    }
-                    else
-                    {
-                        converted.Append(".*");
-                    }
+                    converted.Append(AllowsEmptyWildcard(pattern, i) ? ".*" : ".+");
+                    break;
+                case '#':
+                    converted.Append(@"\d");
+                    break;
+                case '@':
+                    converted.Append("[a-zA-Z]");
+                    break;
+                case '?':
+                    converted.Append(@"\w");
                     break;
                 default:
-                    if (i == 0)
-                    {
-                        converted.Append(".*");
-                    }
-                    converted.Append(Regex.Escape(currentChar.ToString()));
-                    if (i == pattern.Length - 1)
-                    {
-                        converted.Append(".*");
-                    }
+                    converted.Append(currentChar);
                     break;
             }
         }
 
+        var startsWithWildcard = IsUnescapedWildcardAt(pattern, 0);
+        var endsWithWildcard = IsUnescapedWildcardAt(pattern, pattern.Length - 1);
+
+        if (startsWithWildcard && !endsWithWildcard)
+        {
+            converted.Append('$');
+        }
+        else if (endsWithWildcard && !startsWithWildcard)
+        {
+            converted.Insert(0, '^');
+        }
+
         return converted.ToString();
+    }
+
+    private static IEnumerable<string> SplitPatterns(string pattern)
+    {
+        var current = new StringBuilder();
+        var braceDepth = 0;
+        var bracketDepth = 0;
+        var escaped = false;
+
+        foreach (var currentChar in pattern)
+        {
+            if (escaped)
+            {
+                current.Append(currentChar);
+                escaped = false;
+                continue;
+            }
+
+            if (currentChar == '\\')
+            {
+                current.Append(currentChar);
+                escaped = true;
+                continue;
+            }
+
+            switch (currentChar)
+            {
+                case '{':
+                    braceDepth++;
+                    break;
+                case '}' when braceDepth > 0:
+                    braceDepth--;
+                    break;
+                case '[':
+                    bracketDepth++;
+                    break;
+                case ']' when bracketDepth > 0:
+                    bracketDepth--;
+                    break;
+                case ',':
+                case '，':
+                    if (braceDepth == 0 && bracketDepth == 0)
+                    {
+                        if (current.Length > 0)
+                        {
+                            yield return current.ToString();
+                            current.Clear();
+                        }
+
+                        continue;
+                    }
+
+                    break;
+            }
+
+            current.Append(currentChar);
+        }
+
+        if (current.Length > 0)
+        {
+            yield return current.ToString();
+        }
+    }
+
+    private static bool AllowsEmptyWildcard(string pattern, int index)
+    {
+        return (index == 0 || index == pattern.Length - 1) && !ContainsRegexSyntax(pattern);
+    }
+
+    private static bool ContainsRegexSyntax(string pattern)
+    {
+        foreach (var currentChar in pattern)
+        {
+            switch (currentChar)
+            {
+                case '+':
+                case '{':
+                case '}':
+                case '[':
+                case ']':
+                case '(':
+                case ')':
+                case '|':
+                case '^':
+                case '$':
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static bool IsUnescapedWildcardAt(string pattern, int index)
+    {
+        if (index < 0 || index >= pattern.Length)
+        {
+            return false;
+        }
+
+        if (pattern[index] is not ('*' or '%'))
+        {
+            return false;
+        }
+
+        var slashCount = 0;
+        for (var i = index - 1; i >= 0 && pattern[i] == '\\'; i--)
+        {
+            slashCount++;
+        }
+
+        return slashCount % 2 == 0;
     }
 }

@@ -4,10 +4,11 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:CodeWF.Tools.AvaloniaDemo.Views"
-        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="500"
-        Width="400" Height="500"
+        mc:Ignorable="d" d:DesignWidth="1180" d:DesignHeight="760"
+        Width="1180" Height="760"
+        MinWidth="980" MinHeight="680"
         x:Class="CodeWF.Tools.AvaloniaDemo.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
-        Title="CodeWF.Tools.AvaloniaDemo">
+        Title="CodeWF.Tools 桌面测试台">
         <views:MainView />
 </Window>

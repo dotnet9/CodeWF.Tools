@@ -1,61 +1,226 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:CodeWF.Tools.AvaloniaDemo.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="650"
-             x:Class="CodeWF.Tools.AvaloniaDemo.Views.MainView"
-             x:DataType="vm:MainViewModel">
+<UserControl
+    x:Class="CodeWF.Tools.AvaloniaDemo.Views.MainView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:log="https://codewf.com"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:CodeWF.Tools.AvaloniaDemo.ViewModels"
+    d:DesignHeight="760"
+    d:DesignWidth="1180"
+    x:DataType="vm:MainViewModel"
+    mc:Ignorable="d">
     <Design.DataContext>
-        <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
         <vm:MainViewModel />
     </Design.DataContext>
-    <TabControl TabStripPlacement="Left">
-        <TabItem Header="App.config读写">
-            <ScrollViewer>
-                <StackPanel>
-                    <Button Content="读取指定配置" Click="ReadSpecialConfig_OnClick" />
-                    <Button Content="读取" Click="ReadMainConfig_OnClick" />
-                    <Button Content="修改" Click="ChangeMainConfig_OnClick" />
-                    <TextBlock x:Name="TxtMainThemeConfig" />
-                </StackPanel>
-            </ScrollViewer>
-        </TabItem>
-        <TabItem Header="Json与Yaml转换">
-            <StackPanel>
-                <Button Content="Json转Yaml" Click="Json2Yaml_OnClick" />
-                <Button Content="Yaml转Json" Click="Yaml2Json_OnClick" />
-            </StackPanel>
-        </TabItem>
-        <TabItem Header="应用程序信息">
-            <TextBlock Text="{Binding AssemblyInfo}" />
-        </TabItem>
-        <TabItem Header="测试Json序列化">
-            <ScrollViewer>
-                <StackPanel>
-                <Button Content="简单测试" Click="SerialTest_OnClick" />
-                    <Button Content="一般类" Click="SerialNormalClass_OnClick" />
-                    <Button Content="枚举类" Click="SerialClassWithEnum_OnClick" />
-                    <Button Content="字典" Click="SerialDictionary_OnClick" />
-                    <Button Content="复杂类" Click="SerialClassWithDict_OnClick" />
-                    <SelectableTextBlock Name="TxtJsonStr" TextWrapping="Wrap" />
-                </StackPanel>
-            </ScrollViewer>
-        </TabItem>
-        <TabItem Header="测试XML序列化">
 
-            <ScrollViewer>
-                <StackPanel>
-                    <Button Content="一般类" Click="SerialClassXml_OnClick" />
-                    <SelectableTextBlock Name="TxtXmlStr" TextWrapping="Wrap" />
+    <UserControl.Styles>
+        <Style Selector="Button.action">
+            <Setter Property="MinHeight" Value="34" />
+            <Setter Property="Padding" Value="14 6" />
+        </Style>
+        <Style Selector="TextBox.output">
+            <Setter Property="AcceptsReturn" Value="True" />
+            <Setter Property="FontFamily" Value="Consolas, Microsoft YaHei UI" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid Background="#F6F8FB" RowDefinitions="48,*,32">
+        <!-- 顶部区域用于承载测试台名称和高频操作，降低查找成本。 -->
+        <Border Background="#0F6BFF" Padding="18 0">
+            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
+                <StackPanel VerticalAlignment="Center" Spacing="2">
+                    <TextBlock
+                        FontSize="16"
+                        FontWeight="SemiBold"
+                        Foreground="White"
+                        Text="CodeWF.Tools 桌面测试台" />
+                    <TextBlock
+                        FontSize="12"
+                        Foreground="#DCEAFF"
+                        Text="集中验证配置、序列化、文件、网络、图片与日志能力" />
                 </StackPanel>
-            </ScrollViewer>
-        </TabItem>
-        <TabItem Header="二维码">
-            <StackPanel>
-                <Button Content="生成" Click="GeneratorQrCode_OnClick" />
-            </StackPanel>
-        </TabItem>
-    </TabControl>
+                <Button
+                    Grid.Column="1"
+                    Classes="action"
+                    Click="RunAllTests_OnClick"
+                    Content="运行全部测试" />
+                <Button
+                    Grid.Column="2"
+                    Classes="action"
+                    Click="ClearOutput_OnClick"
+                    Content="清空结果" />
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" ColumnDefinitions="236,*">
+            <Border
+                Background="#FFFFFF"
+                BorderBrush="#E1E7F0"
+                BorderThickness="0 0 1 0"
+                Padding="14 16">
+                <StackPanel Spacing="12">
+                    <TextBlock
+                        FontSize="13"
+                        FontWeight="SemiBold"
+                        Foreground="#6B7280"
+                        Text="测试分组" />
+                    <Button
+                        HorizontalContentAlignment="Left"
+                        Click="SelectConfigTab_OnClick"
+                        Content="配置与基础能力" />
+                    <Button
+                        HorizontalContentAlignment="Left"
+                        Click="SelectSerializationTab_OnClick"
+                        Content="JSON / YAML / XML" />
+                    <Button
+                        HorizontalContentAlignment="Left"
+                        Click="SelectFileNetworkTab_OnClick"
+                        Content="文件 / 网络 / 图片" />
+                    <Separator Margin="0 6" />
+                    <TextBlock
+                        Foreground="#6B7280"
+                        Text="日志视图会同步显示每一步测试过程，日志内容统一使用中文简体。"
+                        TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
+            <Grid Grid.Column="1" Margin="16" RowDefinitions="*,220" RowSpacing="12">
+                <TabControl x:Name="ToolTabs">
+                    <TabItem Header="配置与基础">
+                        <ScrollViewer>
+                            <StackPanel Spacing="14">
+                                <Border Background="White" BorderBrush="#E1E7F0" BorderThickness="1" CornerRadius="6" Padding="16">
+                                    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="10">
+                                        <TextBlock FontSize="18" FontWeight="SemiBold" Text="App.config 读写" />
+                                        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+                                            <Button Classes="action" Click="ReadSpecialConfig_OnClick" Content="读取指定配置" />
+                                            <Button Classes="action" Click="ReadMainConfig_OnClick" Content="读取主配置" />
+                                            <Button Classes="action" Click="ChangeMainConfig_OnClick" Content="切换主题值" />
+                                        </StackPanel>
+                                        <TextBox
+                                            x:Name="TxtMainThemeConfig"
+                                            Grid.Row="2"
+                                            Classes="output"
+                                            MinHeight="78"
+                                            PlaceholderText="配置测试结果" />
+                                    </Grid>
+                                </Border>
+
+                                <Border Background="White" BorderBrush="#E1E7F0" BorderThickness="1" CornerRadius="6" Padding="16">
+                                    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="10">
+                                        <TextBlock FontSize="18" FontWeight="SemiBold" Text="正则、超时与程序集信息" />
+                                        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+                                            <Button Classes="action" Click="RegexTest_OnClick" Content="测试通配正则" />
+                                            <Button Classes="action" Click="ActionHelperTest_OnClick" Content="测试超时检测" />
+                                            <Button Classes="action" Click="AssemblyInfoTest_OnClick" Content="读取程序集信息" />
+                                        </StackPanel>
+                                        <TextBox
+                                            x:Name="TxtRegexResult"
+                                            Grid.Row="2"
+                                            Classes="output"
+                                            MinHeight="120"
+                                            PlaceholderText="基础能力测试结果" />
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
+
+                    <TabItem Header="JSON / YAML / XML">
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                            <Border Background="White" BorderBrush="#E1E7F0" BorderThickness="1" CornerRadius="6" Padding="16">
+                                <Grid RowDefinitions="Auto,Auto,*" RowSpacing="10">
+                                    <TextBlock FontSize="18" FontWeight="SemiBold" Text="JSON 与 YAML" />
+                                    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+                                        <Button Classes="action" Click="Json2Yaml_OnClick" Content="JSON 转 YAML" />
+                                        <Button Classes="action" Click="Yaml2Json_OnClick" Content="YAML 转 JSON" />
+                                        <Button Classes="action" Click="SerialClassWithDict_OnClick" Content="复杂对象往返" />
+                                    </StackPanel>
+                                    <TextBox
+                                        x:Name="TxtJsonStr"
+                                        Grid.Row="2"
+                                        Classes="output"
+                                        PlaceholderText="JSON / YAML 测试结果" />
+                                </Grid>
+                            </Border>
+
+                            <Border Grid.Column="1" Background="White" BorderBrush="#E1E7F0" BorderThickness="1" CornerRadius="6" Padding="16">
+                                <Grid RowDefinitions="Auto,Auto,*" RowSpacing="10">
+                                    <TextBlock FontSize="18" FontWeight="SemiBold" Text="序列化覆盖" />
+                                    <WrapPanel Grid.Row="1" Orientation="Horizontal">
+                                        <Button Classes="action" Margin="0 0 8 8" Click="SerialTest_OnClick" Content="列表模型" />
+                                        <Button Classes="action" Margin="0 0 8 8" Click="SerialNormalClass_OnClick" Content="普通模型" />
+                                        <Button Classes="action" Margin="0 0 8 8" Click="SerialClassWithEnum_OnClick" Content="枚举模型" />
+                                        <Button Classes="action" Margin="0 0 8 8" Click="SerialDictionary_OnClick" Content="字典模型" />
+                                        <Button Classes="action" Margin="0 0 8 8" Click="SerialClassXml_OnClick" Content="XML 输出" />
+                                    </WrapPanel>
+                                    <TextBox
+                                        x:Name="TxtXmlStr"
+                                        Grid.Row="2"
+                                        Classes="output"
+                                        PlaceholderText="序列化测试结果" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+
+                    <TabItem Header="文件 / 网络 / 图片">
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="*,*" ColumnSpacing="12" RowSpacing="12">
+                            <Border Background="White" BorderBrush="#E1E7F0" BorderThickness="1" CornerRadius="6" Padding="16">
+                                <Grid RowDefinitions="Auto,Auto,*" RowSpacing="10">
+                                    <TextBlock FontSize="18" FontWeight="SemiBold" Text="文件帮助方法" />
+                                    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+                                        <Button Classes="action" Click="FileHelperTest_OnClick" Content="读写与编码" />
+                                        <Button Classes="action" Click="PathHelperTest_OnClick" Content="路径标准化" />
+                                    </StackPanel>
+                                    <TextBox x:Name="TxtFileResult" Grid.Row="2" Classes="output" PlaceholderText="文件测试结果" />
+                                </Grid>
+                            </Border>
+
+                            <Border Grid.Column="1" Background="White" BorderBrush="#E1E7F0" BorderThickness="1" CornerRadius="6" Padding="16">
+                                <Grid RowDefinitions="Auto,Auto,*" RowSpacing="10">
+                                    <TextBlock FontSize="18" FontWeight="SemiBold" Text="网络帮助方法" />
+                                    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+                                        <Button Classes="action" Click="NetworkHelperTest_OnClick" Content="本机地址与端口" />
+                                        <Button Classes="action" Click="MulticastHelperTest_OnClick" Content="组播地址生成" />
+                                    </StackPanel>
+                                    <TextBox x:Name="TxtNetworkResult" Grid.Row="2" Classes="output" PlaceholderText="网络测试结果" />
+                                </Grid>
+                            </Border>
+
+                            <Border Grid.Row="1" Grid.ColumnSpan="2" Background="White" BorderBrush="#E1E7F0" BorderThickness="1" CornerRadius="6" Padding="16">
+                                <Grid RowDefinitions="Auto,Auto,*" RowSpacing="10">
+                                    <TextBlock FontSize="18" FontWeight="SemiBold" Text="图片与二维码" />
+                                    <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+                                        <Button Classes="action" Click="GeneratorQrCode_OnClick" Content="生成二维码" />
+                                        <Button Classes="action" Click="IconHelperTest_OnClick" Content="生成 ICO" />
+                                    </StackPanel>
+                                    <TextBox x:Name="TxtImageResult" Grid.Row="2" Classes="output" PlaceholderText="图片测试结果" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+
+                <Border Grid.Row="1" Background="White" BorderBrush="#E1E7F0" BorderThickness="1" CornerRadius="6" Padding="10">
+                    <Grid RowDefinitions="Auto,*" RowSpacing="8">
+                        <TextBlock FontWeight="SemiBold" Text="测试日志" />
+                        <log:LogView Grid.Row="1" />
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+
+        <Border Grid.Row="2" Background="#FFFFFF" BorderBrush="#E1E7F0" BorderThickness="0 1 0 0" Padding="16 0">
+            <TextBlock
+                x:Name="TxtStatus"
+                VerticalAlignment="Center"
+                Foreground="#4B5563"
+                Text="准备就绪" />
+        </Border>
+    </Grid>
 </UserControl>

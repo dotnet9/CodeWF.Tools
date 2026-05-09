@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using YamlDotNet.System.Text.Json;
+using YamlDotNet.RepresentationModel;
 
 namespace CodeWF.Tools.Extensions;
 public class NullableDateTimeConverter : JsonConverter<DateTime?>
@@ -28,6 +29,8 @@ public class NullableDateTimeConverter : JsonConverter<DateTime?>
 }
 public static class JsonExtensions
 {
+    [RequiresUnreferencedCode("This overload uses reflection-based System.Text.Json metadata. Use the JsonTypeInfo<T> overload in Native AOT or trimmed apps.")]
+    [RequiresDynamicCode("This overload may require runtime code generation. Use the JsonTypeInfo<T> overload in Native AOT apps.")]
     public static bool ToJson<T>(this T obj,  out string? json, out string? errorMsg, JsonSerializerOptions? options = null)
     {
         if (obj == null)
@@ -61,6 +64,8 @@ public static class JsonExtensions
         }
     }
 
+    [RequiresUnreferencedCode("This overload uses reflection-based System.Text.Json metadata. Use the JsonTypeInfo<T> overload in Native AOT or trimmed apps.")]
+    [RequiresDynamicCode("This overload may require runtime code generation. Use the JsonTypeInfo<T> overload in Native AOT apps.")]
     public static bool FromJson<T>(this string? json, out T? obj, out string? errorMsg, JsonSerializerOptions? options = null )
     {
         if (string.IsNullOrWhiteSpace(json))
@@ -83,6 +88,52 @@ public static class JsonExtensions
             }
 
             obj = JsonSerializer.Deserialize<T>(json!, options);
+            errorMsg = default;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            obj = default;
+            errorMsg = ex.Message;
+            return false;
+        }
+    }
+
+    public static bool ToJson<T>(this T obj, JsonTypeInfo<T> jsonTypeInfo, out string? json, out string? errorMsg)
+    {
+        if (obj == null)
+        {
+            json = default;
+            errorMsg = "Please provide object";
+            return false;
+        }
+
+        try
+        {
+            json = JsonSerializer.Serialize(obj, jsonTypeInfo);
+            errorMsg = default;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            json = default;
+            errorMsg = ex.Message;
+            return false;
+        }
+    }
+
+    public static bool FromJson<T>(this string? json, JsonTypeInfo<T> jsonTypeInfo, out T? obj, out string? errorMsg)
+    {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            obj = default;
+            errorMsg = "Please provide json string";
+            return false;
+        }
+
+        try
+        {
+            obj = JsonSerializer.Deserialize(json!, jsonTypeInfo);
             errorMsg = default;
             return true;
         }
@@ -146,12 +197,11 @@ public static class JsonExtensions
 
         try
         {
-            var options = new JsonSerializerOptions()
-            {
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                TypeInfoResolver = new DefaultJsonTypeInfoResolver()
-            };
-            yamlString = YamlConverter.SerializeJson(jsonString!, jsonSerializerOptions: options);
+            using var jsonDoc = JsonDocument.Parse(jsonString);
+            var yaml = new YamlStream(new YamlDocument(ToYamlNode(jsonDoc.RootElement)));
+            using var writer = new StringWriter();
+            yaml.Save(writer, assignAnchors: false);
+            yamlString = writer.ToString();
             errorMsg = default;
             return true;
         }
@@ -160,6 +210,47 @@ public static class JsonExtensions
             yamlString = default;
             errorMsg = ex.Message;
             return false;
+        }
+    }
+
+    private static YamlNode ToYamlNode(JsonElement element)
+    {
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.Object:
+                var mapping = new YamlMappingNode();
+                foreach (var property in element.EnumerateObject())
+                {
+                    mapping.Add(new YamlScalarNode(property.Name), ToYamlNode(property.Value));
+                }
+
+                return mapping;
+
+            case JsonValueKind.Array:
+                var sequence = new YamlSequenceNode();
+                foreach (var item in element.EnumerateArray())
+                {
+                    sequence.Add(ToYamlNode(item));
+                }
+
+                return sequence;
+
+            case JsonValueKind.String:
+                return new YamlScalarNode(element.GetString());
+
+            case JsonValueKind.Number:
+                return new YamlScalarNode(element.GetRawText());
+
+            case JsonValueKind.True:
+                return new YamlScalarNode("true");
+
+            case JsonValueKind.False:
+                return new YamlScalarNode("false");
+
+            case JsonValueKind.Null:
+            case JsonValueKind.Undefined:
+            default:
+                return new YamlScalarNode("null");
         }
     }
 

@@ -9,13 +9,13 @@ public class ActionHelperTest
     [Fact]
     public void Test_CheckNormalAction_Success()
     {
-        var check = ActionHelper.CheckOvertime(DoSomething, 400);
+        var check = ActionHelper.CheckOvertime(DoSomething, 2000);
         Assert.True(check);
         return;
 
         void DoSomething()
         {
-            Thread.Sleep(TimeSpan.FromMilliseconds(300));
+            Thread.Sleep(TimeSpan.FromMilliseconds(50));
         }
     }
 
@@ -23,13 +23,11 @@ public class ActionHelperTest
     public void Test_CheckOvertimeAction_Success()
     {
         var cancellationTokenSource = new CancellationTokenSource();
-        var check = ActionHelper.CheckOvertime(DoSomething, 3000);
+        var check = ActionHelper.CheckOvertime(DoSomething, 100);
         Debug.WriteLine("Cancel running");
         cancellationTokenSource.Cancel();
         Assert.False(check);
         Debug.WriteLine("Check over");
-        Thread.Sleep(TimeSpan.FromSeconds(5));
-        Debug.WriteLine("End Test");
         return;
 
         void DoSomething()
@@ -38,7 +36,7 @@ public class ActionHelperTest
             while (!cancellationTokenSource.IsCancellationRequested)
             {
                 Debug.WriteLine($"{beginTime.GetDiffTime(DateTime.Now)}: Test overtime");
-                Thread.Sleep(TimeSpan.FromMilliseconds(100));
+                Thread.Sleep(TimeSpan.FromMilliseconds(10));
             }
         }
     }

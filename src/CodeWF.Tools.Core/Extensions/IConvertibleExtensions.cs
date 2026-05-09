@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 
@@ -36,7 +37,8 @@ public static class IConvertibleExtensions
     /// <typeparam name="T"></typeparam>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static T ConvertTo<T>(this IConvertible value) where T : IConvertible
+    [RequiresUnreferencedCode("TypeDescriptor 转换器依赖反射和运行时类型描述，Native AOT/裁剪发布请优先使用显式类型转换。")]
+    public static T ConvertTo<T>(this IConvertible? value) where T : IConvertible
     {
         if (value != null)
         {
@@ -48,12 +50,12 @@ public static class IConvertibleExtensions
 
             if (type.IsEnum)
             {
-                return (T)Enum.Parse(type, value.ToString(CultureInfo.InvariantCulture));
+                return (T)Enum.Parse(type, value.ToString(CultureInfo.InvariantCulture)!);
             }
 
             if (value == DBNull.Value)
             {
-                return default;
+                return default!;
             }
 
             if (type.IsNumeric())
@@ -65,25 +67,25 @@ public static class IConvertibleExtensions
             {
                 var underlyingType = Nullable.GetUnderlyingType(type);
                 return (T)(underlyingType!.IsEnum
-                    ? Enum.Parse(underlyingType, value.ToString(CultureInfo.CurrentCulture))
-                    : Convert.ChangeType(value, underlyingType));
+                    ? Enum.Parse(underlyingType, value.ToString(CultureInfo.CurrentCulture)!)
+                    : Convert.ChangeType(value, underlyingType, CultureInfo.InvariantCulture)!);
             }
 
             var converter = TypeDescriptor.GetConverter(value);
             if (converter.CanConvertTo(type))
             {
-                return (T)converter.ConvertTo(value, type);
+                return (T)converter.ConvertTo(value, type)!;
             }
 
             converter = TypeDescriptor.GetConverter(type);
             if (converter.CanConvertFrom(value.GetType()))
             {
-                return (T)converter.ConvertFrom(value);
+                return (T)converter.ConvertFrom(value)!;
             }
 
-            return (T)Convert.ChangeType(value, type);
+            return (T)Convert.ChangeType(value, type, CultureInfo.InvariantCulture)!;
         }
 
-        return (T)value;
+        return default!;
     }
 }

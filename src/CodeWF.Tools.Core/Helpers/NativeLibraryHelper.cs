@@ -12,10 +12,10 @@ namespace CodeWF.Tools.Helpers;
 public static class NativeLibraryHelper
 {
     // VC库句柄，Key：库名，Value：库句柄
-    private static Dictionary<string, nint?> _libraryIntPtrs = new();
+    private static readonly Dictionary<string, nint> LibraryIntPtrs = new();
 
     // VC库方法句饼，Key：库名+方法名，Value：方法句柄
-    private static Dictionary<string, nint?> _libraryMethodIntPtrs = new();
+    private static readonly Dictionary<string, nint> LibraryMethodIntPtrs = new();
 
     public static bool LoadLibrary(string dllDir, string dllNamePrefix, string x64Suffix, string x86Suffix,
         out string? errorMessage)
@@ -44,7 +44,7 @@ public static class NativeLibraryHelper
             return false;
         }
 
-        return IsLoadMethod(dllPtr.Value, methodName, out ptr, out errorMsg);
+        return IsLoadMethod(dllPtr, methodName, out ptr, out errorMsg);
     }
 
     private static bool TryGetLibraryPath(string dllDir, string dllNamePrefix, string x64Suffix, string x86Suffix,
@@ -66,18 +66,18 @@ public static class NativeLibraryHelper
         }
     }
 
-    private static bool GetDefaultLibrary(out IntPtr? dllPtr, out string? errorMsg)
+    private static bool GetDefaultLibrary(out IntPtr dllPtr, out string? errorMsg)
     {
         dllPtr = default;
         errorMsg = default;
-        if (!_libraryIntPtrs.Any())
+        if (!LibraryIntPtrs.Any())
         {
             errorMsg = "Please load the dynamic library first";
             return false;
         }
 
-        dllPtr = _libraryIntPtrs.FirstOrDefault().Value;
-        if (dllPtr.HasValue && dllPtr.Value != IntPtr.Zero)
+        dllPtr = LibraryIntPtrs.FirstOrDefault().Value;
+        if (dllPtr != IntPtr.Zero)
         {
             return true;
         }
@@ -100,7 +100,7 @@ public static class NativeLibraryHelper
             return false;
         }
 
-        if (_libraryIntPtrs.ContainsKey(dllPath))
+        if (LibraryIntPtrs.ContainsKey(dllPath))
         {
             return true;
         }
@@ -112,7 +112,7 @@ public static class NativeLibraryHelper
             return false;
         }
 
-        _libraryIntPtrs[dllPath] = dllPtr;
+        LibraryIntPtrs[dllPath] = dllPtr;
         return true;
     }
 
@@ -125,36 +125,60 @@ public static class NativeLibraryHelper
             return false;
         }
 
-        TryGetLibraryPath(dllDir, dllNamePrefix, x64Suffix, x86Suffix, out var dllPath, out errorMsg);
-        var methodKey = $"{dllPath}+{methodName}";
-        if (_libraryMethodIntPtrs.ContainsKey(methodKey))
+        if (!TryGetLibraryPath(dllDir, dllNamePrefix, x64Suffix, x86Suffix, out var dllPath, out errorMsg) ||
+            dllPath is null)
         {
+            return false;
+        }
+
+        var methodKey = $"{dllPath}+{methodName}";
+        if (LibraryMethodIntPtrs.TryGetValue(methodKey, out var cachedMethodPtr))
+        {
+            methodPtr = cachedMethodPtr;
             return true;
         }
 
-        var dllPtr = _libraryIntPtrs[dllPath];
-        return IsLoadMethod(dllPtr, methodName, out methodPtr, out errorMsg);
+        var dllPtr = LibraryIntPtrs[dllPath];
+        if (!IsLoadMethod(dllPtr, methodName, out methodPtr, out errorMsg))
+        {
+            return false;
+        }
+
+        if (methodPtr.HasValue)
+        {
+            LibraryMethodIntPtrs[methodKey] = methodPtr.Value;
+        }
+
+        return true;
     }
 
-    private static bool IsLoadMethod(IntPtr? dllPtr, string methodName, out IntPtr? methodPtr, out string? errorMsg)
+    private static bool IsLoadMethod(IntPtr dllPtr, string methodName, out IntPtr? methodPtr, out string? errorMsg)
     {
         methodPtr = default;
         errorMsg = default;
-        if (!dllPtr.HasValue || dllPtr == IntPtr.Zero)
+        if (dllPtr == IntPtr.Zero)
         {
             errorMsg = $"Dynamic library loading failed, please check";
             return false;
         }
 
-        methodPtr = NativeLibrary.GetExport(dllPtr.Value, methodName);
-
-        if (methodPtr != IntPtr.Zero)
+        try
         {
-            return true;
-        }
+            methodPtr = NativeLibrary.GetExport(dllPtr, methodName);
 
-        errorMsg =
-            $"The dynamic library does not provide method export, method name is [{methodName}]";
-        return false;
+            if (methodPtr != IntPtr.Zero)
+            {
+                return true;
+            }
+
+            errorMsg =
+                $"The dynamic library does not provide method export, method name is [{methodName}]";
+            return false;
+        }
+        catch (Exception ex)
+        {
+            errorMsg = ex.Message;
+            return false;
+        }
     }
 }

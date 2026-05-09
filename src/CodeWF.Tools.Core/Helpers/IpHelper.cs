@@ -19,7 +19,7 @@ public static class IpHelper
     /// <returns></returns>
     public static async Task<string?> GetLocalIpAsync()
     {
-        var httpClient = new HttpClient();
+        using var httpClient = new HttpClient();
         using var response = await httpClient.GetAsync("https://ipv4.gdt.qq.com/get_client_ip");
         var str = await response.Content.ReadAsStringAsync();
         return IPAddress.TryParse(str, out var ip) ? ip.ToString() : string.Empty;
@@ -187,6 +187,11 @@ public static class IpHelper
     public static bool GetMulticastIpAndPort(out string ip, out int port, int startPort = 7000, int endPort = 7999,
         bool needConnectCheck = false)
     {
+        if (startPort > endPort)
+        {
+            throw new ArgumentOutOfRangeException(nameof(startPort), "startPort must be less than or equal to endPort.");
+        }
+
         while (true)
         {
             // 多播、组播
@@ -199,16 +204,20 @@ public static class IpHelper
 
             var udpListeners = IPGlobalProperties.GetIPGlobalProperties().GetActiveUdpListeners();
             var tcpListeners = IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners();
-            while (udpListeners.Any(listener => listener.Port == tempPort) ||
-                   tcpListeners.Any(listener => listener.Port == tempPort))
+            while (tempPort <= endPort && (udpListeners.Any(listener => listener.Port == tempPort) ||
+                   tcpListeners.Any(listener => listener.Port == tempPort)))
+            {
                 tempPort++;
+            }
+
+            if (tempPort > endPort)
+            {
+                throw new InvalidOperationException($"No available port was found between {startPort} and {endPort}.");
+            }
 
             port = tempPort;
-            if (!needConnectCheck || CheckMulticastAvailabilityAsync(ip, tempPort).Result) return true;
+            if (!needConnectCheck || CheckMulticastAvailability(ip, tempPort, out _)) return true;
             needConnectCheck = false;
-            continue;
-
-            break;
         }
     }
 }

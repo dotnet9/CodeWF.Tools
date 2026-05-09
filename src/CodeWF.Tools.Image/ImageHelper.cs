@@ -9,8 +9,8 @@ public static class ImageHelper
 {
     public static async Task MergeGenerateIcon(string sourceImagePath, string destIconPath, uint[] sizes)
     {
-        var baseImage = new MagickImage(sourceImagePath);
-        var collection = new MagickImageCollection();
+        using var baseImage = new MagickImage(sourceImagePath);
+        using var collection = new MagickImageCollection();
 
         foreach (var size in sizes)
         {
@@ -26,11 +26,11 @@ public static class ImageHelper
     {
         var fileName = Path.GetFileNameWithoutExtension(sourceImagePath);
 
-        var baseImage = new MagickImage(sourceImagePath);
+        using var baseImage = new MagickImage(sourceImagePath);
 
         foreach (var size in sizes)
         {
-            var resizedImage = baseImage.Clone();
+            using var resizedImage = baseImage.Clone();
             resizedImage.Resize(size, size);
 
             var savePath = Path.Combine(destIconFolder, $"{fileName}-{size}x{size}.ico");

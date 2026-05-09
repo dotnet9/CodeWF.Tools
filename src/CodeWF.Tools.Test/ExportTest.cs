@@ -21,7 +21,7 @@ public class ExportTest
 
         var importResult = DataTableExtensions.Import(file, out errorMsg, out var newData);
         Assert.True(importResult);
-        CheckData(data, newData);
+        CheckData(data, Assert.IsType<DataTable>(newData));
 
         FileHelper.DeleteFileIfExist(file);
     }
@@ -39,7 +39,7 @@ public class ExportTest
 
         var importResult = DataTableExtensions.Import(file, out errorMsg, out var newData);
         Assert.True(importResult);
-        CheckData(data, newData);
+        CheckData(data, Assert.IsType<DataTable>(newData));
 
         FileHelper.DeleteFileIfExist(file);
     }

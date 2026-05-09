@@ -7,16 +7,16 @@ namespace CodeWF.Tools.Test;
 public class IpHelperTest
 {
     [Fact]
-    public void Test_GetLocalIpAsync_Success()
+    public async Task Test_GetLocalIpAsync_Success()
     {
-        var ip = IpHelper.GetLocalIpAsync().Result;
+        var ip = await IpHelper.GetLocalIpAsync();
         Assert.False(ip.IsNullOrEmpty());
     }
 
     [Fact]
-    public void Test_GetAllIpv4Async_Success()
+    public async Task Test_GetAllIpv4Async_Success()
     {
-        var ip = IpHelper.GetAllIpV4Async().Result;
+        var ip = await IpHelper.GetAllIpV4Async();
         Assert.False(ip.IsNullOrEmpty());
     }
 

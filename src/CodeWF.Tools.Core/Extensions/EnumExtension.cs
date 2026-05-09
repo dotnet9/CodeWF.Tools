@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 
@@ -19,7 +21,8 @@ public static class EnumExtension
     /// </summary>
     /// <param name="enumType"></param>
     /// <returns></returns>
-    public static Dictionary<int, string> GetDictionary(this Type enumType)
+    public static Dictionary<int, string> GetDictionary(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] this Type enumType)
     {
         if (!enumType.IsEnum)
         {
@@ -29,13 +32,14 @@ public static class EnumExtension
         return EnumNameValueDict.GetOrAdd(enumType, _ => GetDictionaryItems(enumType));
     }
 
-    private static Dictionary<int, string> GetDictionaryItems(Type enumType)
+    private static Dictionary<int, string> GetDictionaryItems(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type enumType)
     {
         var enumItems = enumType.GetFields(BindingFlags.Public | BindingFlags.Static);
         var names = new Dictionary<int, string>(enumItems.Length);
         foreach (var enumItem in enumItems)
         {
-            names[(int)enumItem.GetValue(enumType)] = enumItem.Name;
+            names[Convert.ToInt32(enumItem.GetValue(null), CultureInfo.InvariantCulture)] = enumItem.Name;
         }
 
         return names;
@@ -45,6 +49,7 @@ public static class EnumExtension
     /// 根据枚举成员获取Display的属性Name
     /// </summary>
     /// <returns></returns>
+    [RequiresUnreferencedCode("该方法通过反射读取 DisplayAttribute，Native AOT/裁剪发布请优先使用源生成或静态映射。")]
     public static string GetDisplay(this Enum en)
     {
         var type = en.GetType(); //获取类型
@@ -55,7 +60,7 @@ public static class EnumExtension
                     Length: > 0
                 } attrs)
         {
-            return attrs[0].Name; //返回当前描述
+            return attrs[0].GetName() ?? en.ToString(); //返回当前描述
         }
 
         return en.ToString();
@@ -67,6 +72,8 @@ public static class EnumExtension
     /// <param name ="value">枚举值</param>
     /// <param name ="args">要格式化的对象</param>
     /// <returns>如果未找到DescriptionAttribute则返回null或返回类型描述</returns>
+    [RequiresUnreferencedCode("该方法通过反射读取 DescriptionAttribute，Native AOT/裁剪发布请优先使用源生成或静态映射。")]
+    [RequiresDynamicCode("该方法需要按运行时枚举类型枚举成员，Native AOT 发布请优先使用泛型或静态映射。")]
     public static string GetDescription(this Enum value, params object[] args)
     {
         var enumType = value.GetType();
@@ -96,23 +103,27 @@ public static class EnumExtension
     /// <param name ="value">枚举值</param>
     /// <param name ="args">要格式化的对象</param>
     /// <returns>如果未找到DescriptionAttribute则返回null或返回类型描述</returns>
+    [RequiresUnreferencedCode("该方法通过反射读取枚举自定义特性，Native AOT/裁剪发布请优先使用源生成或静态映射。")]
+    [RequiresDynamicCode("该方法需要按运行时枚举类型枚举成员，Native AOT 发布请优先使用泛型或静态映射。")]
     public static IEnumerable<TAttribute> GetAttributes<TAttribute>(this Enum value) where TAttribute : Attribute
     {
         var type = value.GetType();
         if (!Enum.IsDefined(type, value))
         {
             return Enum.GetValues(type).OfType<Enum>().Where(value.HasFlag).SelectMany(e =>
-                type.GetField(e.ToString()).GetCustomAttributes<TAttribute>(false));
+                type.GetField(e.ToString())?.GetCustomAttributes<TAttribute>(false) ??
+                Enumerable.Empty<TAttribute>());
         }
 
-        return type.GetField(value.ToString()).GetCustomAttributes<TAttribute>(false);
+        return type.GetField(value.ToString())?.GetCustomAttributes<TAttribute>(false) ??
+               Enumerable.Empty<TAttribute>();
     }
 
     /// <summary>
     /// 拆分枚举值
     /// </summary>
     /// <param name ="value">枚举值</param>
-    public static IEnumerable<TEnum> Split<TEnum>(this TEnum value) where TEnum : Enum
+    public static IEnumerable<TEnum> Split<TEnum>(this TEnum value) where TEnum : struct, Enum
     {
         var type = typeof(TEnum);
         return Enum.IsDefined(type, value)
@@ -120,7 +131,7 @@ public static class EnumExtension
             {
                 value
             }
-            : Enum.GetValues(type).Cast<TEnum>().Where(e => value.HasFlag(e));
+            : Enum.GetValues<TEnum>().Where(e => value.HasFlag(e));
     }
 
     /// <summary>
@@ -128,7 +139,9 @@ public static class EnumExtension
     /// </summary>
     /// <param name ="value">枚举值</param>
     /// <returns>如果未找到DescriptionAttribute则返回null或返回类型描述</returns>
-    public static EnumDescriptionAttribute GetEnumDescription(this Enum value)
+    [RequiresUnreferencedCode("该方法通过反射读取 EnumDescriptionAttribute，Native AOT/裁剪发布请优先使用源生成或静态映射。")]
+    [RequiresDynamicCode("该方法需要按运行时枚举类型枚举成员，Native AOT 发布请优先使用泛型或静态映射。")]
+    public static EnumDescriptionAttribute? GetEnumDescription(this Enum value)
     {
         return GetEnumDescriptions(value).FirstOrDefault();
     }
@@ -138,6 +151,8 @@ public static class EnumExtension
     /// </summary>
     /// <param name ="value">枚举值</param>
     /// <returns>如果未找到DescriptionAttribute则返回null或返回类型描述</returns>
+    [RequiresUnreferencedCode("该方法通过反射读取 EnumDescriptionAttribute，Native AOT/裁剪发布请优先使用源生成或静态映射。")]
+    [RequiresDynamicCode("该方法需要按运行时枚举类型枚举成员，Native AOT 发布请优先使用泛型或静态映射。")]
     public static IEnumerable<EnumDescriptionAttribute> GetEnumDescriptions(this Enum value)
     {
         if (value == null)
@@ -149,12 +164,12 @@ public static class EnumExtension
         if (!Enum.IsDefined(type, value))
         {
             return Enum.GetValues(type).OfType<Enum>().Where(value.HasFlag).SelectMany(e =>
-                type.GetField(e.ToString()).GetCustomAttributes(typeof(EnumDescriptionAttribute), false)
-                    .OfType<EnumDescriptionAttribute>());
+                type.GetField(e.ToString())?.GetCustomAttributes(typeof(EnumDescriptionAttribute), false)
+                    .OfType<EnumDescriptionAttribute>() ?? Enumerable.Empty<EnumDescriptionAttribute>());
         }
 
-        return type.GetField(value.ToString()).GetCustomAttributes(typeof(EnumDescriptionAttribute), false)
-            .OfType<EnumDescriptionAttribute>();
+        return type.GetField(value.ToString())?.GetCustomAttributes(typeof(EnumDescriptionAttribute), false)
+            .OfType<EnumDescriptionAttribute>() ?? Enumerable.Empty<EnumDescriptionAttribute>();
     }
 
     /// <summary>
@@ -163,9 +178,11 @@ public static class EnumExtension
     /// <param name="value"></param>
     /// <param name="enumType"></param>
     /// <returns></returns>
-    public static string ToEnumString(this int value, Type enumType)
+    public static string ToEnumString(
+        this int value,
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type enumType)
     {
-        return GetEnumStringFromEnumValue(enumType)[value.ToString()];
+        return GetEnumStringFromEnumValue(enumType)[value.ToString(CultureInfo.InvariantCulture)] ?? string.Empty;
     }
 
     /// <summary>
@@ -173,7 +190,8 @@ public static class EnumExtension
     /// </summary>
     /// <param name="enumType"></param>
     /// <returns></returns>
-    public static NameValueCollection GetEnumStringFromEnumValue(Type enumType)
+    public static NameValueCollection GetEnumStringFromEnumValue(
+        [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicFields)] Type enumType)
     {
         var nvc = new NameValueCollection();
         var fields = enumType.GetFields();
@@ -181,7 +199,8 @@ public static class EnumExtension
         {
             if (!field.FieldType.IsEnum) continue;
 
-            var strValue = ((int)enumType.InvokeMember(field.Name, BindingFlags.GetField, null, null, null)).ToString();
+            var strValue = Convert.ToInt32(field.GetValue(null), CultureInfo.InvariantCulture)
+                .ToString(CultureInfo.InvariantCulture);
             nvc.Add(strValue, field.Name);
         }
 
@@ -191,14 +210,23 @@ public static class EnumExtension
     /// <summary>
     /// 根据枚举成员获取自定义属性EnumDisplayNameAttribute的属性DisplayName
     /// </summary>
+    [RequiresUnreferencedCode("该方法通过反射读取枚举描述，Native AOT/裁剪发布请优先使用源生成或静态映射。")]
+    [RequiresDynamicCode("该方法需要按运行时枚举类型枚举成员，Native AOT 发布请优先使用泛型或静态映射。")]
     public static Dictionary<string, int> GetDescriptionAndValue(this Type enumType) => Enum.GetValues(enumType)
-        .Cast<object>().ToDictionary(e => (e as Enum).GetDescription(), e => (int)e);
+        .Cast<object>().ToDictionary(e => ((Enum)e).GetDescription(), e => Convert.ToInt32(e, CultureInfo.InvariantCulture));
 
     private static string GetDescriptionPrivate(Enum value, params object[] args)
     {
         var fieldInfo = value.GetType().GetField(value.ToString());
         var attribute =
-            Attribute.GetCustomAttribute(fieldInfo!, typeof(DescriptionAttribute)) as DescriptionAttribute;
+            fieldInfo is null
+                ? null
+                : Attribute.GetCustomAttribute(fieldInfo, typeof(DescriptionAttribute)) as DescriptionAttribute;
+        if (attribute is null)
+        {
+            return value.ToString();
+        }
+
         var description = attribute.Description;
         return args.Length > 0 ? string.Format(description, args) : description;
     }

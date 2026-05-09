@@ -56,7 +56,7 @@ public static class NumberExtension
     /// <param name="number">22.22</param>
     public static string ToChineseMoney(IConvertible number)
     {
-        var m = number.ConvertTo<decimal>();
+        var m = Convert.ToDecimal(number, CultureInfo.InvariantCulture);
         if (m == 0)
         {
             return "零元整";

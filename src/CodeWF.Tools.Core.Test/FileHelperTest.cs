@@ -48,7 +48,7 @@ namespace CodeWF.Tools.Core.Test
                 catch (Exception ex)
                 {
                     // 捕获异常并输出详细信息
-                    Assert.True(false, $"处理文件 {filePath} 时发生异常: {ex.Message}");
+                    Assert.Fail($"处理文件 {filePath} 时发生异常: {ex.Message}");
                 }
             }
         }

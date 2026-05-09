@@ -38,16 +38,7 @@ public class SevenZipCompressor : ISevenZipCompressor
     /// <param name="ignoreEmptyDir">忽略空文件夹</param>
     public void Decompress(string compressedFile, string dir, bool ignoreEmptyDir = true)
     {
-        if (string.IsNullOrEmpty(dir))
-        {
-            dir = Path.GetDirectoryName(compressedFile);
-        }
-
-        ArchiveFactory.WriteToDirectory(compressedFile, Directory.CreateDirectory(dir).FullName, new ReaderOptions()
-        {
-            ExtractFullPath = true,
-            Overwrite = true
-        });
+        Decompress(compressedFile, dir);
     }
 
     /// <summary>
@@ -59,10 +50,10 @@ public class SevenZipCompressor : ISevenZipCompressor
     {
         if (string.IsNullOrEmpty(dir))
         {
-            dir = Path.GetDirectoryName(compressedFile);
+            dir = Path.GetDirectoryName(compressedFile) ?? Directory.GetCurrentDirectory();
         }
 
-        ArchiveFactory.WriteToDirectory(compressedFile, Directory.CreateDirectory(dir).FullName, new ReaderOptions()
+        ArchiveFactory.WriteToDirectory(compressedFile, Directory.CreateDirectory(dir).FullName, new ExtractionOptions()
         {
             ExtractFullPath = true,
             Overwrite = true
@@ -108,9 +99,9 @@ public class SevenZipCompressor : ISevenZipCompressor
     /// <returns></returns>
     private IWritableArchive<ZipWriterOptions> CreateZipArchive(IEnumerable<string> files, string rootdir)
     {
-        var archive = ZipArchive.CreateArchive();
+        var archive = ArchiveFactory.CreateArchive<ZipWriterOptions>();
         var dic = GetFileEntryMaps(files);
-        var remoteUrls = files.Distinct().Where(s => s.StartsWith("http")).Select(s =>
+        var remoteUrls = files.Distinct().Where(s => s.StartsWith("http", StringComparison.OrdinalIgnoreCase)).Select(s =>
         {
             try
             {
@@ -120,7 +111,7 @@ public class SevenZipCompressor : ISevenZipCompressor
             {
                 return null;
             }
-        }).Where(u => u != null).ToList();
+        }).OfType<Uri>().ToList();
         foreach (var pair in dic)
         {
             archive.AddEntry(Path.Combine(rootdir, pair.Value), pair.Key);
@@ -128,22 +119,7 @@ public class SevenZipCompressor : ISevenZipCompressor
 
         if (remoteUrls.Any())
         {
-            var streams = new ConcurrentDictionary<string, Stream>();
-            Parallel.ForEach(remoteUrls, url =>
-            {
-                _httpClient.GetAsync(url).ContinueWith(async t =>
-                {
-                    if (t.IsCompleted)
-                    {
-                        var res = await t;
-                        if (res.IsSuccessStatusCode)
-                        {
-                            var stream = await res.Content.ReadAsStreamAsync();
-                            streams[Path.Combine(rootdir, Path.GetFileName(HttpUtility.UrlDecode(url.AbsolutePath)))] = stream;
-                        }
-                    }
-                }).Wait();
-            });
+            var streams = DownloadRemoteEntriesAsync(remoteUrls, rootdir).GetAwaiter().GetResult();
             foreach (var pair in streams)
             {
                 archive.AddEntry(pair.Key, pair.Value, true);
@@ -151,6 +127,29 @@ public class SevenZipCompressor : ISevenZipCompressor
         }
 
         return archive;
+    }
+
+    private async Task<ConcurrentDictionary<string, Stream>> DownloadRemoteEntriesAsync(IEnumerable<Uri> remoteUrls,
+        string rootdir)
+    {
+        var streams = new ConcurrentDictionary<string, Stream>();
+        var tasks = remoteUrls.Select(async url =>
+        {
+            using var res = await _httpClient.GetAsync(url);
+            if (!res.IsSuccessStatusCode)
+            {
+                return;
+            }
+
+            var stream = new MemoryStream();
+            await res.Content.CopyToAsync(stream);
+            stream.Position = 0;
+            var entryName = Path.Combine(rootdir, Path.GetFileName(HttpUtility.UrlDecode(url.AbsolutePath)));
+            streams[entryName] = stream;
+        });
+
+        await Task.WhenAll(tasks);
+        return streams;
     }
 
     /// <summary>
@@ -173,7 +172,7 @@ public class SevenZipCompressor : ISevenZipCompressor
             }
         }
 
-        files.Where(s => !s.StartsWith("http")).ToList().ForEach(s =>
+        files.Where(s => !s.StartsWith("http", StringComparison.OrdinalIgnoreCase)).ToList().ForEach(s =>
         {
             if (Directory.Exists(s))
             {
@@ -193,7 +192,7 @@ public class SevenZipCompressor : ISevenZipCompressor
         var dirname = new string(fileList.First().Substring(0, fileList.Min(s => s.Length)).TakeWhile((c, i) => fileList.All(s => s[i] == c)).ToArray());
         if (!Directory.Exists(dirname))
         {
-            dirname = Directory.GetParent(dirname).FullName;
+            dirname = Directory.GetParent(dirname)?.FullName ?? Directory.GetCurrentDirectory();
         }
 
         return fileList.ToDictionary(s => s, s => s.Substring(dirname.Length));

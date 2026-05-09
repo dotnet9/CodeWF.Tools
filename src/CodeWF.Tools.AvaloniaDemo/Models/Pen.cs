@@ -4,11 +4,11 @@ namespace CodeWF.Tools.AvaloniaDemo.Models;
 
 public class Pen
 {
-    public string Color { get; set; }
+    public string Color { get; set; } = string.Empty;
 
     public double TipSize { get; set; }
 
-    public string Type { get; set; }
+    public string Type { get; set; } = string.Empty;
 
     public bool HasInk { get; set; }
 

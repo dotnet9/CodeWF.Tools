@@ -15,12 +15,12 @@ public static class DataTableExtensions
     public static bool Export(this DataTable dataTable, string saveFilePath, Encoding encoding, out string errorMsg,
         bool containColumnHeader = true)
     {
-        if (saveFilePath.ToLower().EndsWith(".csv"))
+        if (saveFilePath.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
         {
             return dataTable.ExportToCsv(saveFilePath, encoding, out errorMsg, containColumnHeader);
         }
 
-        if (saveFilePath.ToLower().EndsWith(".xlsx"))
+        if (saveFilePath.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
         {
             return dataTable.ExportToXlsx(saveFilePath, out errorMsg, containColumnHeader);
         }
@@ -87,12 +87,12 @@ public static class DataTableExtensions
     public static bool Import(string openFilePath, out string errorMsg, out DataTable? dataTable,
         bool containColumnHeader = true)
     {
-        if (openFilePath.ToLower().EndsWith(".csv"))
+        if (openFilePath.EndsWith(".csv", StringComparison.OrdinalIgnoreCase))
         {
             return ImportFromCsv(openFilePath, out errorMsg, out dataTable, containColumnHeader);
         }
 
-        if (openFilePath.ToLower().EndsWith(".xlsx"))
+        if (openFilePath.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
         {
             return ImportFromExcel(openFilePath, out errorMsg, out dataTable, containColumnHeader);
         }
@@ -114,6 +114,11 @@ public static class DataTableExtensions
             {
                 csv.ReadHeader();
                 var headers = csv.HeaderRecord;
+                if (headers is null)
+                {
+                    throw new InvalidDataException("Can't read table headers");
+                }
+
                 foreach (var header in headers)
                 {
                     dataTable.Columns.Add(header);
@@ -122,6 +127,14 @@ public static class DataTableExtensions
 
             while (csv.Read())
             {
+                if (dataTable.Columns.Count == 0)
+                {
+                    for (var i = 0; i < csv.ColumnCount; i++)
+                    {
+                        dataTable.Columns.Add(i.ToString(CultureInfo.InvariantCulture));
+                    }
+                }
+
                 var row = dataTable.NewRow();
                 for (var i = 0; i < csv.ColumnCount; i++)
                 {
@@ -178,10 +191,15 @@ public static class DataTableExtensions
             for (var i = 0; i < excelData.Count; i++)
             {
                 var rowDatas = excelData[i] as IDictionary<string, object>;
+                if (rowDatas is null)
+                {
+                    continue;
+                }
+
                 var row = dataTable.NewRow();
                 foreach (var columnName in columnNames)
                 {
-                    row[columnName] = rowDatas!.TryGetValue(columnName, out var val) ? val : DBNull.Value;
+                    row[columnName] = rowDatas.TryGetValue(columnName, out var val) ? val : DBNull.Value;
                 }
 
                 dataTable.Rows.Add(row);

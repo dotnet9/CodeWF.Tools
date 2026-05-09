@@ -21,7 +21,7 @@ public class EnumDescriptionAttribute : DescriptionAttribute
         Language = language ?? throw new ArgumentNullException(nameof(language));
     }
 
-    public string Display { get; set; }
+    public string? Display { get; set; }
 
-    public string Language { get; set; }
+    public string? Language { get; set; }
 }

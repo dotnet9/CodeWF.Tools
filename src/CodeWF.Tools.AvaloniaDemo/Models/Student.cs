@@ -18,8 +18,8 @@ public class Student
 
     public List<Project>? Projects { get; set; }
 
-    public Dictionary<string, string> Keys { get; set; }
-    public Dictionary<string, double> Scords { get; set; }
+    public Dictionary<string, string> Keys { get; set; } = new();
+    public Dictionary<string, double> Scords { get; set; } = new();
 
     public DateTime CreateTime { get; set; }
 }
@@ -55,13 +55,13 @@ public class Project
 {
     public int? Id { get; set; }
 
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     public int Record { get; set; }
 
     [XmlArray(ElementName = "Members")]
     [XmlArrayItem(typeof(Member))]
-    public List<Member> Members { get; set; }
+    public List<Member> Members { get; set; } = new();
 }
 
 [JsonSerializable(typeof(Project))]

@@ -18,7 +18,7 @@ public static class DoubleExtensions
         bytes = Math.Abs(bytes);
 
         var unit = 0;
-        while (bytes >= 1024 && unit < Enum.GetValues(typeof(ByteUnit)).Length - 1)
+        while (bytes >= 1024 && unit < Enum.GetValues<ByteUnit>().Length - 1)
         {
             bytes /= 1024;
             ++unit;

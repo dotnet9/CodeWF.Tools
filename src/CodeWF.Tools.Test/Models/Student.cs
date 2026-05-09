@@ -16,12 +16,12 @@ public class Student
 
     public List<Project>? Projects { get; set; }
 
-    public Dictionary<string, string> Keys { get; set; }
+    public Dictionary<string, string> Keys { get; set; } = new();
 }
 
 public class Project
 {
-    public string Id { get; set; }
-    public string Name { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
     public int Record { get; set; }
 }

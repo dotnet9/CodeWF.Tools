@@ -25,7 +25,7 @@ public static class FileHelper
     /// </summary>
     /// <exception cref="IOException"></exception>
     /// <exception cref="FileNotFoundException"></exception>
-    public static async Task<string> SafeReadAllTextAsync(string filePath, Encoding encoding = null, int retryCount = 3, int retryDelayMs = 100)
+    public static async Task<string> SafeReadAllTextAsync(string filePath, Encoding? encoding = null, int retryCount = 3, int retryDelayMs = 100)
     {
         encoding ??= Encoding.UTF8;
         int attempt = 0;
@@ -68,7 +68,7 @@ public static class FileHelper
     /// </summary>
     /// <returns></returns>
     /// <exception cref="IOException"></exception>
-    public static async Task SafeWriteAllTextAsync(string filePath, string content, Encoding encoding = null, int retryCount = 3, int retryDelayMs = 100)
+    public static async Task SafeWriteAllTextAsync(string filePath, string content, Encoding? encoding = null, int retryCount = 3, int retryDelayMs = 100)
     {
         encoding ??= Encoding.UTF8;
         int attempt = 0;
@@ -78,9 +78,11 @@ public static class FileHelper
             try
             {
                 // 确保目录存在
-                string directory = Path.GetDirectoryName(filePath);
-                if (!Directory.Exists(directory))
+                string? directory = Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
+                {
                     Directory.CreateDirectory(directory);
+                }
 
                 // 写入时设置独占访问，写完立即释放
                 using (var fileStream = new FileStream(
@@ -182,7 +184,7 @@ public static class FileHelper
         else
         {
             // 未知系统：兜底打开文件所在目录
-            OpenFolder(Path.GetDirectoryName(normalizedPath));
+            OpenFolder(Path.GetDirectoryName(Path.GetFullPath(normalizedPath))!);
         }
     }
 
@@ -378,7 +380,11 @@ public static class FileHelper
         catch (Exception)
         {
             // 兜底：仅打开文件所在目录
-            OpenFolder(Path.GetDirectoryName(filePath));
+            var folder = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrWhiteSpace(folder))
+            {
+                OpenFolder(folder);
+            }
         }
     }
 
@@ -421,7 +427,7 @@ public static class FileHelper
         }
 
         // 未知桌面环境：仅打开目录
-        return ("xdg-open", $"\"{Path.GetDirectoryName(filePath)}\"");
+        return ("xdg-open", $"\"{Path.GetDirectoryName(filePath) ?? "."}\"");
     }
 
     /// <summary>

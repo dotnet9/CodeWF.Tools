@@ -101,12 +101,7 @@ public static class AssemblyExtensions
             exePath = Process.GetCurrentProcess()?.MainModule?.FileName;
             if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
             {
-                // 如果获取失败，尝试使用 Assembly.Location
-                exePath = assembly?.Location;
-                if (string.IsNullOrWhiteSpace(exePath) || !File.Exists(exePath))
-                {
-                    return default;
-                }
+                return default;
             }
         }
         catch
@@ -139,7 +134,7 @@ public static class AssemblyExtensions
             var buffer = new byte[ReadCount];
             using (var s = new FileStream(exePath, FileMode.Open, FileAccess.Read))
             {
-                s.Read(buffer, 0, ReadCount);
+                s.ReadExactly(buffer, 0, ReadCount);
             }
 
             var i = BitConverter.ToInt32(buffer, PeHeaderOffset);
@@ -189,7 +184,7 @@ public static class AssemblyExtensions
             using (var s = new FileStream(exePath, FileMode.Open, FileAccess.Read))
             {
                 // 读取整个 ELF 头部
-                s.Read(buffer, 0, ElfHeaderSize);
+                s.ReadExactly(buffer, 0, ElfHeaderSize);
             }
 
             // 验证 ELF 魔数

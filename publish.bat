@@ -1,0 +1,7 @@
+﻿@echo off
+setlocal enabledelayedexpansion
+
+set "project_paths=src\CodeWF.Tools.AvaloniaDemo"
+set "platforms=win-x64"
+
+call "%~dp0publishbase.bat" "%project_paths%" "%platforms%"

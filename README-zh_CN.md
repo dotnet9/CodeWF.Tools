@@ -7,14 +7,22 @@
 | CodeWF.Tools.Files | [![NuGet](https://img.shields.io/nuget/v/CodeWF.Tools.Files.svg)](https://www.nuget.org/packages/CodeWF.Tools.Files/) | [![NuGet](https://img.shields.io/nuget/dt/CodeWF.Tools.Files.svg)](https://www.nuget.org/packages/CodeWF.Tools.Files/) |
 | CodeWF.Tools.Image | [![NuGet](https://img.shields.io/nuget/v/CodeWF.Tools.Image.svg)](https://www.nuget.org/packages/CodeWF.Tools.Image/) | [![NuGet](https://img.shields.io/nuget/dt/CodeWF.Tools.Image.svg)](https://www.nuget.org/packages/CodeWF.Tools.Image/) |
 
-**“CodeWF.Tools，让C#编码变得更简单！”**
+**CodeWF.Tools，让 C# 编码变得更简单。**
 
-"CodeWF.Tools 是一个开源的工具库，专为C#开发者设计。它集合了一系列实用且高效的工具函数和类，旨在简化日常开发任务，提升开发效率。无论是处理字符串、日期时间，还是进行文件操作、数据加密，CodeWF.Tools都提供了便捷的方法。该库注重易用性和扩展性，让开发者能够轻松集成并使用。通过不断优化和更新，CodeWF.Tools致力于成为C#开发者不可或缺的开发伴侣。无论你是初学者还是资深开发者，都能从中受益，让编码变得更加简单愉快。"
+CodeWF.Tools 是一个面向 C# 开发者的开源工具库，提供字符串、日期时间、文件操作、JSON/YAML 转换、图片处理等常用能力，目标是简化日常开发任务并提升开发效率。
 
 - CodeWF.Tools.Core: .NET原生功能扩展，无第三方库依赖
 - CodeWF.Tools.Files：文件操作类集合
 - CodeWF.Tools.Image：图片处理集合
 - CodeWF.Tools：集成前面的包，功能最全
+
+## 开发
+
+本仓库使用 NuGet 中央包管理，包版本统一维护在 `Directory.Packages.props`。
+
+- 更新日志：[中文](UpdateLog.md) / [English](UpdateLog.en.md)
+- 贡献指南：[CONTRIBUTING.md](CONTRIBUTING.md)
+- 安全策略：[SECURITY.md](SECURITY.md)
 
 ## 感谢
 

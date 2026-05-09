@@ -34,9 +34,10 @@ public class JsonExtensionsTest
 
         table1.ToJson(out var json, out var errorMsg);
 
-        var convertResult = json.FromJson(out Hashtable table2, out errorMsg);
+        var convertResult = json.FromJson(out Hashtable? table2, out errorMsg);
 
         Assert.True(convertResult);
+        Assert.NotNull(table2);
         Assert.Equal(table1.Count, table2.Count);
     }
 }
