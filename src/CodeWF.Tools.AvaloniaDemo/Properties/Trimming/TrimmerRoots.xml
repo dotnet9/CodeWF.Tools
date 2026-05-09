@@ -1,0 +1,3 @@
+<linker>
+  <assembly fullname="CodeWF.Tools.AvaloniaDemo" preserve="all" />
+</linker>

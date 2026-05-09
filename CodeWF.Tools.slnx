@@ -10,26 +10,29 @@
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
     <File Path="logo.png" />
+    <File Path="pack.bat" />
+    <File Path="publish.bat" />
+    <File Path="Publish.Common.pubxml" />
+    <File Path="publishbase.bat" />
     <File Path="README-zh_CN.md" />
     <File Path="README.md" />
     <File Path="SECURITY.md" />
+    <File Path="UpdateAssemblyVersion.ps1" />
     <File Path="UpdateLog.en.md" />
     <File Path="UpdateLog.md" />
   </Folder>
-  <Folder Name="/src/">
-    <Project Path="src/CodeWF.Tools.Core/CodeWF.Tools.Core.csproj">
-      <Platform Solution="*|x64" Project="x64" />
-    </Project>
-    <Project Path="src/CodeWF.Tools.Files/CodeWF.Tools.Files.csproj">
-      <Platform Solution="*|x64" Project="x64" />
-    </Project>
-    <Project Path="src/CodeWF.Tools.Image/CodeWF.Tools.Image.csproj">
-      <Platform Solution="*|x64" Project="x64" />
-    </Project>
-    <Project Path="src/CodeWF.Tools/CodeWF.Tools.csproj">
-      <Platform Solution="*|x64" Project="x64" />
-    </Project>
-  </Folder>
+	<Project Path="src/CodeWF.Tools.Core/CodeWF.Tools.Core.csproj">
+	  <Platform Solution="*|x64" Project="x64" />
+	</Project>
+	<Project Path="src/CodeWF.Tools.Files/CodeWF.Tools.Files.csproj">
+	  <Platform Solution="*|x64" Project="x64" />
+	</Project>
+	<Project Path="src/CodeWF.Tools.Image/CodeWF.Tools.Image.csproj">
+	  <Platform Solution="*|x64" Project="x64" />
+	</Project>
+	<Project Path="src/CodeWF.Tools/CodeWF.Tools.csproj">
+	  <Platform Solution="*|x64" Project="x64" />
+	</Project>
   <Folder Name="/test/">
     <Project Path="src/CodeWF.Tools.AvaloniaDemo/CodeWF.Tools.AvaloniaDemo.csproj">
       <Platform Solution="*|x64" Project="x64" />
