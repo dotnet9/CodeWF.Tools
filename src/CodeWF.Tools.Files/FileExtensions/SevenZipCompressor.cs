@@ -97,9 +97,9 @@ public class SevenZipCompressor : ISevenZipCompressor
     /// <param name="rootdir"></param>
     /// <param name="archiveType"></param>
     /// <returns></returns>
-    private IWritableArchive<ZipWriterOptions> CreateZipArchive(IEnumerable<string> files, string rootdir)
+    private IWritableArchive CreateZipArchive(IEnumerable<string> files, string rootdir)
     {
-        var archive = ArchiveFactory.CreateArchive<ZipWriterOptions>();
+        var archive = ArchiveFactory.Create(ArchiveType.Zip);
         var dic = GetFileEntryMaps(files);
         var remoteUrls = files.Distinct().Where(s => s.StartsWith("http", StringComparison.OrdinalIgnoreCase)).Select(s =>
         {

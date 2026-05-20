@@ -1,5 +1,13 @@
 # Changelog
 
+## V1.3.13.2 (2026-05-20)
+
+- 🔨[优化]-Bumped the package version to `1.3.13.2`.
+- 🔨[优化]-Updated the Avalonia demo package family to `Avalonia` 12.0.3.
+- 🔨[优化]-Updated dependencies to the latest stable source-open NuGet versions checked for this repository: `coverlet.collector` 10.0.1, `MiniExcel` 1.44.1, `SharpCompress` 1.0.0, `System.Configuration.ConfigurationManager` 10.0.8, and `System.Text.Json` 10.0.8.
+- 🔨[优化]-Enabled NuGet central transitive package pinning for stricter dependency resolution.
+- 🔨[优化]-Adapted `SevenZipCompressor` to the SharpCompress 1.0 non-generic `IWritableArchive` and `ArchiveFactory.Create(ArchiveType.Zip)` APIs.
+
 ## V1.3.12.3 (2026-05-09)
 
 - 😄[新增]-Added Central Package Management through `Directory.Packages.props`.

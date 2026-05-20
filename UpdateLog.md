@@ -1,5 +1,13 @@
 # 更新日志
 
+## V1.3.13.2（2026-05-20）
+
+- 🔨[优化]-包版本提升到 `1.3.13.2`。
+- 🔨[优化]-Avalonia Demo 相关包更新到 `Avalonia` 12.0.3。
+- 🔨[优化]-升级到本仓库已检查的源码开放 NuGet 稳定最新版：`coverlet.collector` 10.0.1、`MiniExcel` 1.44.1、`SharpCompress` 1.0.0、`System.Configuration.ConfigurationManager` 10.0.8、`System.Text.Json` 10.0.8。
+- 🔨[优化]-启用 NuGet 中央传递依赖固定，使依赖解析更严格。
+- 🔨[优化]-适配 SharpCompress 1.0 的非泛型 `IWritableArchive` 与 `ArchiveFactory.Create(ArchiveType.Zip)` API。
+
 ## V1.3.12.3（2026-05-09）
 
 - 😄[新增]-新增 `Directory.Packages.props`，支持 NuGet 中央包管理。
