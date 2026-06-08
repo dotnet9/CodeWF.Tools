@@ -1,23 +1,6 @@
-# Contributing / 贡献指南
-
-Thanks for helping improve CodeWF.Tools.
+# 贡献指南
 
 感谢你帮助改进 CodeWF.Tools。
-
-## Development
-
-- Use the .NET SDK versions required by the target frameworks in the solution.
-- Run `dotnet restore CodeWF.Tools.slnx --force-evaluate` after changing package versions.
-- Run `dotnet build CodeWF.Tools.slnx --no-restore` before submitting changes.
-- Keep package versions in `Directory.Packages.props`; project files should not carry inline package versions.
-- Use free/open-source NuGet packages only. Avoid commercial packages or packages that require paid runtime behavior.
-
-## Pull Requests
-
-- Keep changes focused and explain the reason for behavior changes.
-- Add or update tests when changing public behavior.
-- Update both `UpdateLog.md` and `UpdateLog.en.md` for user-facing changes.
-- Do not commit generated build output from `Output/`, `.vs/`, or IDE caches.
 
 ## 开发要求
 
@@ -31,5 +14,5 @@ Thanks for helping improve CodeWF.Tools.
 
 - 保持改动聚焦，并说明行为变化原因。
 - 修改公开行为时补充或更新测试。
-- 面向用户的变更需要同步更新 `UpdateLog.md` 和 `UpdateLog.en.md`。
+- 面向用户的变更需要同步更新根目录 `UpdateLog.md`。
 - 不提交 `Output/`、`.vs/` 或 IDE 缓存等生成文件。

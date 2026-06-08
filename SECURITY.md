@@ -1,23 +1,16 @@
-# Security Policy / 安全策略
+# 安全策略
 
-## Supported Versions
+## 支持版本
 
-The latest released version is the primary supported version. Security fixes should target the active main branch first.
+当前最新发布版本为主要支持版本。安全修复应优先进入当前主分支，并随下一次 NuGet 发布同步分发。
 
-## Reporting a Vulnerability
-
-Please report security issues privately through the repository owner's preferred contact channel instead of opening a public issue with exploit details. Include:
-
-- Affected package or API.
-- Reproduction steps.
-- Expected impact.
-- Suggested fix, if available.
-
-## 安全问题报告
+## 报告安全问题
 
 请通过仓库维护者偏好的私密渠道报告安全问题，不要在公开 Issue 中直接披露可利用细节。报告中建议包含：
 
 - 受影响的包或 API。
 - 复现步骤。
 - 预期影响范围。
-- 可选的修复建议。
+- 如已知，可附上建议修复方案。
+
+收到报告后会先确认影响范围，再安排修复、版本升级和更新日志说明。

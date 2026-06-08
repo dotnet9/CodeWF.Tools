@@ -1,38 +1,36 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-	<PropertyGroup>
-		<TargetFrameworks>net8.0;net9.0;net10.0;net11.0</TargetFrameworks>
-		<AssemblyName>$(AssemblyName)</AssemblyName>
-		<Authors>沙漠尽头的狼</Authors>
-		<ApplicationIcon>..\..\logo.ico</ApplicationIcon>
-		<Company>https://codewf.com</Company>
-		<Copyright>https://codewf.com</Copyright>
-		<Description>.NET原生功能扩展，无第三方库依赖</Description>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<IsPackable>true</IsPackable>
-		<LangVersion>latest</LangVersion>
-		<Nullable>enable</Nullable>
-		<OutputType>Library</OutputType>
-		<Owners>https://codewf.com</Owners>
-		<PackageId>$(AssemblyName)</PackageId>
-		<PackageTags>c#,,tools,helper;extensions</PackageTags>
-		<PackageIcon>logo.png</PackageIcon>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageProjectUrl>https://github.com/dotnet9/CodeWF.Tools</PackageProjectUrl>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-		<RepositoryType>git</RepositoryType>
-		<RootNamespace>$(AssemblyName)</RootNamespace>
-		<RepositoryUrl>https://github.com/dotnet9/CodeWF.Tools</RepositoryUrl>
-		<Title>$(AssemblyName)</Title>
-		<Version>$(Version)</Version>
-		<FileVersion>$(Version)</FileVersion>
-		<AssemblyVersion>$(Version)</AssemblyVersion>
-		<Platforms>AnyCPU;x64</Platforms>
-	</PropertyGroup>
-	<ItemGroup>
-		<!-- The nuget package icon -->
-		<None Include="..\..\README.md" Pack="true" PackagePath="" />
-		<None Include="..\..\logo.png" Pack="true" PackagePath="" />
-		<None Include="..\..\logo.ico" Pack="true" PackagePath="" />
-	</ItemGroup>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <AssemblyName>$(AssemblyName)</AssemblyName>
+    <Authors>沙漠尽头的狼</Authors>
+    <ApplicationIcon>..\..\logo.ico</ApplicationIcon>
+    <Company>https://codewf.com</Company>
+    <Copyright>https://codewf.com</Copyright>
+    <Description>.NET原生功能扩展，无第三方库依赖</Description>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <IsPackable>true</IsPackable>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <OutputType>Library</OutputType>
+    <Owners>https://codewf.com</Owners>
+    <PackageId>$(AssemblyName)</PackageId>
+    <PackageTags>c# tools helper extensions</PackageTags>
+    <PackageIcon>logo.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/dotnet9/CodeWF.Tools</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <RepositoryType>git</RepositoryType>
+    <RootNamespace>$(AssemblyName)</RootNamespace>
+    <RepositoryUrl>https://github.com/dotnet9/CodeWF.Tools</RepositoryUrl>
+    <Title>$(AssemblyName)</Title>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="all" />
+    <!-- The nuget package icon -->
+    <None Include="..\..\README.md" Pack="true" PackagePath="" />
+    <None Include="..\..\logo.png" Pack="true" PackagePath="" Link="logo.png" />
+    <None Include="..\..\logo.ico" Pack="true" PackagePath="" Link="logo.ico" />
+  </ItemGroup>
 </Project>

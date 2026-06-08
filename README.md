@@ -1,80 +1,75 @@
 # CodeWF.Tools
 
-[简体中文](README-zh_CN.md) | English
-
-| NuGet Name | NuGet url | Download |
+| 包名 | NuGet 链接 | 下载量 |
 |------|-----------|--------|
 | CodeWF.Tools | [![NuGet](https://img.shields.io/nuget/v/CodeWF.Tools)](https://www.nuget.org/packages/CodeWF.Tools/) | [![NuGet](https://img.shields.io/nuget/dt/CodeWF.Tools)](https://www.nuget.org/packages/CodeWF.Tools/) |
 | CodeWF.Tools.Core | [![NuGet](https://img.shields.io/nuget/v/CodeWF.Tools.Core.svg)](https://www.nuget.org/packages/CodeWF.Tools.Core/) | [![NuGet](https://img.shields.io/nuget/dt/CodeWF.Tools.Core.svg)](https://www.nuget.org/packages/CodeWF.Tools.Core/) |
 | CodeWF.Tools.Files | [![NuGet](https://img.shields.io/nuget/v/CodeWF.Tools.Files.svg)](https://www.nuget.org/packages/CodeWF.Tools.Files/) | [![NuGet](https://img.shields.io/nuget/dt/CodeWF.Tools.Files.svg)](https://www.nuget.org/packages/CodeWF.Tools.Files/) |
 | CodeWF.Tools.Image | [![NuGet](https://img.shields.io/nuget/v/CodeWF.Tools.Image.svg)](https://www.nuget.org/packages/CodeWF.Tools.Image/) | [![NuGet](https://img.shields.io/nuget/dt/CodeWF.Tools.Image.svg)](https://www.nuget.org/packages/CodeWF.Tools.Image/) |
 
-**CodeWF.Tools, making C# coding simpler.**
+**CodeWF.Tools，让 C# 编码变得更简单。**
 
-CodeWF.Tools is an open-source utility library for C# developers. It provides practical helpers for strings, dates, files, JSON/YAML conversion, image utilities, and common development workflows.
+CodeWF.Tools 是一个面向 C# 开发者的开源工具库，提供字符串、日期时间、文件操作、JSON/YAML 转换、图片处理等常用能力，目标是简化日常开发任务并提升开发效率。
 
-## Packages
+- CodeWF.Tools.Core: .NET原生功能扩展，无第三方库依赖
+- CodeWF.Tools.Files：文件操作类集合
+- CodeWF.Tools.Image：图片处理集合
+- CodeWF.Tools：集成前面的包，功能最全
 
-- `CodeWF.Tools.Core`: native .NET extensions without third-party dependencies.
-- `CodeWF.Tools.Files`: file, export, JSON, and YAML utilities.
-- `CodeWF.Tools.Image`: image and QR code utilities.
-- `CodeWF.Tools`: the combined package.
+## 仓库规范
 
-## Development
+- 当前版本：`1.3.13.5`，版本号统一维护在根目录 `Directory.Build.props` 的 `<Version>` 节点。
+- NuGet 包项目统一支持 `net8.0;net10.0`；Demo、App、测试与内部应用项目统一使用 `net11.0` / `net11.0-windows`。
+- 根目录 `logo.svg`、`logo.png`、`logo.ico` 是唯一图标源，子工程只通过 MSBuild `Link` 引用，不维护图标副本。
+- 运行时帮助、Markdown 示例、内置备忘录、设计说明等业务文档按功能保留；仓库级入口文档使用根目录 `README.md` 和 `UpdateLog.md`。
 
-This repository uses NuGet Central Package Management. Package versions are maintained in `Directory.Packages.props`.
+## 开发
 
-- Changelog: [中文](UpdateLog.md) / [English](UpdateLog.en.md)
-- Contributing: [CONTRIBUTING.md](CONTRIBUTING.md)
-- Security: [SECURITY.md](SECURITY.md)
+本仓库使用 NuGet 中央包管理，包版本统一维护在 `Directory.Packages.props`。
 
-## Thanks
+- 更新日志：[UpdateLog.md](UpdateLog.md)
+- 贡献指南：[CONTRIBUTING.md](CONTRIBUTING.md)
+- 安全策略：[SECURITY.md](SECURITY.md)
+- 一键打包：运行 `pack.bat`，NuGet 包输出到 `artifacts\packages`。
+
+## 感谢
 
 - Masuit.Tools：https://github.com/ldqk/Masuit.Tools
 
-## Third-Party Open Source Audit
+## 第三方开源组件审计
 
-Checked on 2026-05-20 with NuGet metadata, restored `project.assets.json`, and upstream source/license links. MIT / Apache-2.0 / BSD are preferred.
+检查时间：2026-05-20。检查范围包括 NuGet 元数据、恢复后的 `project.assets.json`、NuGet.org 信息以及上游源码/许可证链接。优先接受 MIT / Apache-2.0 / BSD。
 
-Remediation:
-
-- Updated `Magick.NET-Q16-AnyCPU` from `14.13.0` to `14.13.1`; `dotnet build CodeWF.Tools.slnx -c Release -m:1` then completed with 0 warnings and 0 errors.
-- Updated the Avalonia demo package family from `12.0.2` to `12.0.3`.
-- Updated `MiniExcel` from `1.43.1` to `1.44.1`, `SharpCompress` from `0.48.0` to `1.0.0`, `System.Configuration.ConfigurationManager` / `System.Text.Json` from `10.0.7` to `10.0.8`, and `coverlet.collector` from `10.0.0` to `10.0.1`.
-- Enabled NuGet central transitive pinning and adapted `SevenZipCompressor` to the SharpCompress 1.0 non-generic `IWritableArchive` / `ArchiveFactory.Create(ArchiveType.Zip)` APIs.
-- Bumped the package version to `1.3.13.2` for the dependency update.
-- Verification completed with `dotnet build CodeWF.Tools.slnx -c Debug --no-restore`, `dotnet test CodeWF.Tools.slnx -c Debug --no-build`, and `dotnet build CodeWF.Tools.slnx -c Release --no-restore -m:1`.
-
-| Package | Usage | License | Source | Status |
+| 包 | 使用范围 | 协议 | 源码/项目地址 | 结论 |
 | --- | --- | --- | --- | --- |
-| `CsvHelper` | `CodeWF.Tools.Files` CSV helpers | MS-PL OR Apache-2.0 | https://github.com/JoshClose/CsvHelper | Approved via Apache-2.0 option |
-| `Magick.NET-Q16-AnyCPU` | `CodeWF.Tools.Image` image helpers | Apache-2.0 | https://github.com/dlemstra/Magick.NET | Approved, `14.13.1` |
-| `MiniExcel` | `CodeWF.Tools.Files` Excel helpers | Apache-2.0 | https://github.com/mini-software/MiniExcel | Approved, `1.44.1` |
-| `SharpCompress` | `CodeWF.Tools.Files` archive helpers | MIT | https://github.com/adamhathcock/sharpcompress | Approved, `1.0.0` |
-| `System.Configuration.ConfigurationManager` / `System.Text.Json` | Configuration and JSON helpers | MIT | https://github.com/dotnet/dotnet | Approved, `10.0.8` |
-| `YamlDotNet` | `CodeWF.Tools.Files` YAML helpers | MIT | https://github.com/aaubry/YamlDotNet | Approved |
-| `ZXing.Net.Bindings.Magick` | QR/barcode helpers | Apache-2.0 | https://github.com/micjahn/ZXing.Net | Approved |
-| `Avalonia` / `Avalonia.Desktop` / `Avalonia.Fonts.Inter` / `Avalonia.Themes.Fluent` | Demo only | MIT | https://github.com/AvaloniaUI/Avalonia | Approved, `12.0.3` |
-| `Bogus` | Test data only | MIT | https://github.com/bchavez/Bogus | Approved |
-| `CodeWF.LogViewer.Avalonia` | Demo only | MIT | https://github.com/dotnet9/CodeWF.LogViewer | Own open-source package |
-| `ReactiveUI.Avalonia` | Demo only | MIT | https://github.com/reactiveui/reactiveui | Approved |
-| `VC-LTL` | Windows demo runtime compatibility | EPL-2.0 | https://github.com/Chuyu-Team/VC-LTL5 | Source-open; approved under the source-traceable non-preferred license rule |
-| `Microsoft.NET.Test.Sdk` / `coverlet.collector` | Tests | MIT | https://github.com/microsoft/vstest / https://github.com/coverlet-coverage/coverlet | Approved, `Microsoft.NET.Test.Sdk` `18.5.1`, `coverlet.collector` `10.0.1` |
-| `xunit.v3` / `xunit.runner.visualstudio` | Tests | Apache-2.0 | https://github.com/xunit/xunit | Approved |
+| `CsvHelper` | `CodeWF.Tools.Files` CSV 辅助 | MS-PL OR Apache-2.0 | https://github.com/JoshClose/CsvHelper | 通过，采用 Apache-2.0 选项 |
+| `Magick.NET-Q16-AnyCPU` | `CodeWF.Tools.Image` 图片辅助 | Apache-2.0 | https://github.com/dlemstra/Magick.NET | 通过，`14.13.1` |
+| `MiniExcel` | `CodeWF.Tools.Files` Excel 辅助 | Apache-2.0 | https://github.com/mini-software/MiniExcel | 通过，`1.44.1` |
+| `SharpCompress` | `CodeWF.Tools.Files` 压缩包辅助 | MIT | https://github.com/adamhathcock/sharpcompress | 通过，`1.0.0` |
+| `System.Configuration.ConfigurationManager` / `System.Text.Json` | 配置和 JSON 辅助 | MIT | https://github.com/dotnet/dotnet | 通过，`10.0.8` |
+| `YamlDotNet` | `CodeWF.Tools.Files` YAML 辅助 | MIT | https://github.com/aaubry/YamlDotNet | 通过 |
+| `ZXing.Net.Bindings.Magick` | 二维码/条码辅助 | Apache-2.0 | https://github.com/micjahn/ZXing.Net | 通过 |
+| `Avalonia` / `Avalonia.Desktop` / `Avalonia.Fonts.Inter` / `Avalonia.Themes.Fluent` | Demo 使用 | MIT | https://github.com/AvaloniaUI/Avalonia | 通过，`12.0.3` |
+| `Bogus` | 测试数据 | MIT | https://github.com/bchavez/Bogus | 通过 |
+| `CodeWF.LogViewer.Avalonia` | Demo 使用 | MIT | https://github.com/dotnet9/CodeWF.LogViewer | 自研开源包 |
+| `ReactiveUI.Avalonia` | Demo 使用 | MIT | https://github.com/reactiveui/reactiveui | 通过 |
+| `VC-LTL` | Windows Demo 运行时兼容 | EPL-2.0 | https://github.com/Chuyu-Team/VC-LTL5 | 源码开放，按“非优先但可追溯”规则通过 |
+| `Microsoft.NET.Test.Sdk` / `coverlet.collector` | 测试 | MIT | https://github.com/microsoft/vstest / https://github.com/coverlet-coverage/coverlet | 通过，`Microsoft.NET.Test.Sdk` `18.5.1`、`coverlet.collector` `10.0.1` |
+| `xunit.v3` / `xunit.runner.visualstudio` | 测试 | Apache-2.0 | https://github.com/xunit/xunit | 通过 |
 
-Transitive dependency check:
+传递依赖检查：
 
-| Dependency group | Representative packages | License | Source | Status |
+| 依赖分组 | 代表包 | 协议 | 源码/项目地址 | 结论 |
 | --- | --- | --- | --- | --- |
-| .NET runtime/configuration stack | `System.Diagnostics.EventLog`, `System.IO.Pipelines`, `System.Text.Encodings.Web`, `System.Security.Cryptography.ProtectedData` | MIT | https://github.com/dotnet/dotnet | Source-open |
-| Magick.NET core | `Magick.NET.Core` | Apache-2.0 | https://github.com/dlemstra/Magick.NET | Source-open |
-| ZXing core | `ZXing.Net` | Apache-2.0 | https://github.com/micjahn/ZXing.Net | Source-open |
-| Avalonia stack | `Avalonia.*`, `Avalonia.BuildServices` | MIT | https://github.com/AvaloniaUI/Avalonia | Source-open |
-| ANGLE native package | `Avalonia.Angle.Windows.Natives` | BSD-style license file | https://github.com/AvaloniaUI/angle | Source-open |
-| Skia/HarfBuzz bindings and native assets | `SkiaSharp*`, `HarfBuzzSharp*` | MIT package license; native projects are source-open | https://github.com/mono/SkiaSharp | Source-open |
-| Reactive stack | `ReactiveUI`, `DynamicData`, `Splat`, `System.Reactive` | MIT | https://github.com/reactiveui/reactiveui / https://github.com/reactiveui/DynamicData / https://github.com/reactiveui/splat / https://github.com/dotnet/reactive | Source-open |
-| Linux desktop interop | `MicroCom.Runtime`, `Tmds.DBus.Protocol` | MIT | https://github.com/kekekeks/MicroCom / https://github.com/tmds/Tmds.DBus | Source-open |
-| Own logging dependency | `CodeWF.Log.Core` | MIT | https://github.com/dotnet9/CodeWF.LogViewer | Own source-open package |
-| Test toolchain | `Microsoft.*`, `Newtonsoft.Json`, `xunit.*` | MIT / Apache-2.0 | https://github.com/microsoft/vstest / https://github.com/microsoft/testfx / https://github.com/JamesNK/Newtonsoft.Json / https://github.com/xunit/xunit | Source-open |
+| .NET 运行时/配置栈 | `System.Diagnostics.EventLog`、`System.IO.Pipelines`、`System.Text.Encodings.Web`、`System.Security.Cryptography.ProtectedData` | MIT | https://github.com/dotnet/dotnet | 源码开放 |
+| Magick.NET 核心 | `Magick.NET.Core` | Apache-2.0 | https://github.com/dlemstra/Magick.NET | 源码开放 |
+| ZXing 核心 | `ZXing.Net` | Apache-2.0 | https://github.com/micjahn/ZXing.Net | 源码开放 |
+| Avalonia 栈 | `Avalonia.*`、`Avalonia.BuildServices` | MIT | https://github.com/AvaloniaUI/Avalonia | 源码开放 |
+| ANGLE 原生包 | `Avalonia.Angle.Windows.Natives` | BSD 风格许可证文件 | https://github.com/AvaloniaUI/angle | 源码开放 |
+| Skia/HarfBuzz 绑定和原生资源 | `SkiaSharp*`、`HarfBuzzSharp*` | NuGet 包为 MIT；底层原生项目源码开放 | https://github.com/mono/SkiaSharp | 源码开放 |
+| Reactive 栈 | `ReactiveUI`、`DynamicData`、`Splat`、`System.Reactive` | MIT | https://github.com/reactiveui/reactiveui / https://github.com/reactiveui/DynamicData / https://github.com/reactiveui/splat / https://github.com/dotnet/reactive | 源码开放 |
+| Linux 桌面互操作 | `MicroCom.Runtime`、`Tmds.DBus.Protocol` | MIT | https://github.com/kekekeks/MicroCom / https://github.com/tmds/Tmds.DBus | 源码开放 |
+| 自研日志依赖 | `CodeWF.Log.Core` | MIT | https://github.com/dotnet9/CodeWF.LogViewer | 自研源码开放包 |
+| 测试工具链 | `Microsoft.*`、`Newtonsoft.Json`、`xunit.*` | MIT / Apache-2.0 | https://github.com/microsoft/vstest / https://github.com/microsoft/testfx / https://github.com/JamesNK/Newtonsoft.Json / https://github.com/xunit/xunit | 源码开放 |
 
-No non-open or black-box dependency is intentionally retained.
+当前未有意保留非开源或黑盒依赖。

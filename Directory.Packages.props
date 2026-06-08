@@ -2,29 +2,29 @@
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
-    <AvaloniaVersion>12.0.3</AvaloniaVersion>
+    <AvaloniaVersion>12.0.4</AvaloniaVersion>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Bogus" Version="35.6.5" />
-    <PackageVersion Include="CodeWF.LogViewer.Avalonia" Version="12.0.2.1" />
+    <PackageVersion Include="CodeWF.LogViewer.Avalonia" Version="12.0.4.2" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
-    <PackageVersion Include="Magick.NET-Q16-AnyCPU" Version="14.13.1" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.5.1" />
+    <PackageVersion Include="Magick.NET-Q16-AnyCPU" Version="14.14.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.6.0" />
     <PackageVersion Include="MiniExcel" Version="1.44.1" />
-    <PackageVersion Include="ReactiveUI.Avalonia" Version="12.0.1" />
+    <PackageVersion Include="ReactiveUI.Avalonia" Version="12.0.3" />
     <PackageVersion Include="SharpCompress" Version="1.0.0" />
     <PackageVersion Include="System.Configuration.ConfigurationManager" Version="10.0.8" />
     <PackageVersion Include="System.Text.Json" Version="10.0.8" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
-    <PackageVersion Include="YamlDotNet" Version="17.1.0" />
+    <PackageVersion Include="YamlDotNet" Version="18.0.0" />
     <PackageVersion Include="ZXing.Net.Bindings.Magick" Version="0.16.17" />
     <PackageVersion Include="VC-LTL" Version="5.3.1" />
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="10.0.300" />
   </ItemGroup>
 </Project>

@@ -8,7 +8,7 @@
         Width="1180" Height="760"
         MinWidth="980" MinHeight="680"
         x:Class="CodeWF.Tools.AvaloniaDemo.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/logo.ico"
         Title="CodeWF.Tools 桌面测试台">
         <views:MainView />
 </Window>

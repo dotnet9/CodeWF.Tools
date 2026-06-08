@@ -15,7 +15,7 @@ dotnet restore CodeWF.Tools.slnx
 if errorlevel 1 goto :error
 
 echo [2/3] Building solution...
-dotnet build CodeWF.Tools.slnx -c %CONFIGURATION% --no-restore
+dotnet build CodeWF.Tools.slnx -c %CONFIGURATION% --no-restore /p:GeneratePackageOnBuild=false
 if errorlevel 1 goto :error
 
 echo [3/3] Packing libraries...

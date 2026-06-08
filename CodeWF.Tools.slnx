@@ -9,16 +9,16 @@
     <File Path="CONTRIBUTING.md" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
+    <File Path="logo.ico" />
     <File Path="logo.png" />
+    <File Path="logo.svg" />
     <File Path="pack.bat" />
     <File Path="publish.bat" />
     <File Path="Publish.Common.pubxml" />
     <File Path="publishbase.bat" />
-    <File Path="README-zh_CN.md" />
     <File Path="README.md" />
     <File Path="SECURITY.md" />
     <File Path="UpdateAssemblyVersion.ps1" />
-    <File Path="UpdateLog.en.md" />
     <File Path="UpdateLog.md" />
   </Folder>
 	<Project Path="src/CodeWF.Tools.Core/CodeWF.Tools.Core.csproj">
