@@ -30,6 +30,17 @@ public class IpHelperTests
     }
 
     [Fact]
+    public void GetAllIpV4_WithLoopback_ShouldIncludeLoopbackFirst()
+    {
+        // Act
+        var result = IpHelper.GetAllIpV4(addLoopback: true);
+
+        // Assert
+        Assert.NotEmpty(result);
+        Assert.Equal(IPAddress.Loopback.ToString(), result[0]);
+    }
+
+    [Fact]
     public async Task GetAllIpV4Async_ShouldReturnListOfIpAddresses()
     {
         // Act
@@ -50,6 +61,32 @@ public class IpHelperTests
         // Assert
         Assert.True(port > 0);
         Assert.True(port < 65536); // Valid port range
+    }
+
+    [Theory]
+    [InlineData("127.0.0.1:2701", "127.0.0.1", 2701, ':')]
+    [InlineData("192.168.1.2;8000", "192.168.1.2", 8000, ';')]
+    public void TrySplitIpPort_WithSingleIp_ShouldParse(string ipPort, string expectedIp, int expectedPort, char separator = ':')
+    {
+        // Act
+        var result = IpHelper.TrySplitIpPort(ipPort, out var ip, out var port, separator);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(expectedIp, ip);
+        Assert.Equal(expectedPort, port);
+    }
+
+    [Fact]
+    public void TrySplitIpPorts_WithMultipleIps_ShouldParse()
+    {
+        // Act
+        var result = IpHelper.TrySplitIpPorts("127.0.0.1,192.168.1.2;2701", out var ips, out var port);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(["127.0.0.1", "192.168.1.2"], ips);
+        Assert.Equal(2701, port);
     }
 
     [Theory]

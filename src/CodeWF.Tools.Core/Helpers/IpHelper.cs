@@ -39,12 +39,93 @@ public static class IpHelper
     /// <summary>
     ///     获取本地所有IP V4地址
     /// </summary>
+    /// <param name="addLoopback">是否在结果开头补充127.0.0.1</param>
+    /// <returns></returns>
+    public static List<string> GetAllIpV4(bool addLoopback)
+    {
+        var ips = GetAllIpV4();
+        var loopbackIp = IPAddress.Loopback.ToString();
+        if (addLoopback && !ips.Contains(loopbackIp, StringComparer.OrdinalIgnoreCase))
+        {
+            ips.Insert(0, loopbackIp);
+        }
+
+        return ips;
+    }
+
+    /// <summary>
+    ///     获取本地所有IP V4地址
+    /// </summary>
     /// <returns></returns>
     public static async Task<List<string>> GetAllIpV4Async()
     {
         var ipAddresses = await Dns.GetHostAddressesAsync(Dns.GetHostName());
         return ipAddresses.Where(address => address.AddressFamily == AddressFamily.InterNetwork)
             .Select(address => address.ToString()).ToList();
+    }
+
+    /// <summary>
+    ///     尝试解析IP和端口字符串，例如127.0.0.1:2701
+    /// </summary>
+    public static bool TrySplitIpPort(string? ipPort, out string ip, out int port, char separator = ':')
+    {
+        ip = string.Empty;
+        port = 0;
+
+        if (string.IsNullOrWhiteSpace(ipPort))
+        {
+            return false;
+        }
+
+        var parts = ipPort.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (parts.Length != 2 || !IPAddress.TryParse(parts[0], out _))
+        {
+            return false;
+        }
+
+        if (!int.TryParse(parts[1], out port))
+        {
+            port = 0;
+            return false;
+        }
+
+        ip = parts[0];
+        return true;
+    }
+
+    /// <summary>
+    ///     尝试解析多IP和端口字符串，例如127.0.0.1,192.168.1.2;2701
+    /// </summary>
+    public static bool TrySplitIpPorts(string? ipPort, out List<string> ips, out int port, string separator = ";")
+    {
+        ips = [];
+        port = 0;
+
+        if (string.IsNullOrWhiteSpace(ipPort))
+        {
+            return false;
+        }
+
+        var parts = ipPort.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (parts.Length != 2)
+        {
+            return false;
+        }
+
+        var parsedIps = parts[0].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (parsedIps.Length == 0 || parsedIps.Any(ip => !IPAddress.TryParse(ip, out _)))
+        {
+            return false;
+        }
+
+        if (!int.TryParse(parts[1], out port))
+        {
+            port = 0;
+            return false;
+        }
+
+        ips.AddRange(parsedIps);
+        return true;
     }
 
     /// <summary>
