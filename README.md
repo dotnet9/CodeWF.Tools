@@ -73,3 +73,6 @@ CodeWF.Tools 是一个面向 C# 开发者的开源工具库，提供字符串、
 | 测试工具链 | `Microsoft.*`、`Newtonsoft.Json`、`xunit.*` | MIT / Apache-2.0 | https://github.com/microsoft/vstest / https://github.com/microsoft/testfx / https://github.com/JamesNK/Newtonsoft.Json / https://github.com/xunit/xunit | 源码开放 |
 
 当前未有意保留非开源或黑盒依赖。
+## Package Versioning Convention
+
+Keep NuGet package versions and Central Package Management settings in `Directory.Packages.props`, including shared version properties such as `AvaloniaVersion`. Keep `Directory.Build.props` focused on build, compiler, and NuGet package metadata. When referenced, `VC-LTL` and `YY-Thunks` should use their latest prerelease versions for OS platform compatibility.
