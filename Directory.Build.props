@@ -10,7 +10,7 @@
     <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory).vs\$(SolutionName)\Intermediate\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
     <OutputPath>$(MSBuildThisFileDirectory)Output\</OutputPath>
     <AppendTargetFrameworkToOutputPath>True</AppendTargetFrameworkToOutputPath>
-    <Version>1.3.13.7</Version>
+    <Version>1.3.13.8</Version>
     <Authors>沙漠尽头的狼</Authors>
     <Company>https://codewf.com</Company>
     <Copyright>https://codewf.com</Copyright>
