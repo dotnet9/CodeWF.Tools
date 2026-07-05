@@ -13,6 +13,10 @@ namespace CodeWF.Tools.Helpers;
 
 public static class IpHelper
 {
+    private const string UdpProbeText = "udp test";
+    private const int MinMulticastFirstByte = 224;
+    private const int MaxMulticastFirstByte = 239;
+
     /// <summary>
     ///     获取本地IP地址详细信息
     /// </summary>
@@ -151,7 +155,7 @@ public static class IpHelper
     public static bool CheckMulticastAvailability(string ip, int port, out string errorMsg)
     {
         errorMsg = string.Empty;
-        
+
         if (!IPAddress.TryParse(ip, out var ipAddress))
         {
             errorMsg = $"IP地址 '{ip}' 格式无效";
@@ -162,18 +166,10 @@ public static class IpHelper
         try
         {
             udpClient = new UdpClient();
-            
-            // 只有对多播地址才调用JoinMulticastGroup
-            byte firstByte = ipAddress.GetAddressBytes()[0];
-            bool isMulticast = firstByte >= 224 && firstByte <= 239;
-            
-            if (isMulticast)
-            {
-                udpClient.JoinMulticastGroup(ipAddress);
-            }
-            
+            JoinMulticastGroupIfNeeded(udpClient, ipAddress);
+
             var endPoint = new IPEndPoint(ipAddress, port);
-            var buffer = Encoding.Default.GetBytes("udp test");
+            var buffer = Encoding.Default.GetBytes(UdpProbeText);
             udpClient.Send(buffer, buffer.Length, endPoint);
         }
         catch (Exception ex)
@@ -183,13 +179,7 @@ public static class IpHelper
         }
         finally
         {
-            var isAvailable = udpClient?.Client?.Available ?? 0;
-            if (isAvailable > 0) udpClient?.Client?.Shutdown(SocketShutdown.Both);
-
-            udpClient?.Client?.Close();
-            udpClient?.Client?.Dispose();
-            udpClient?.Close();
-            udpClient = null;
+            CloseUdpClient(udpClient);
         }
 
         return true;
@@ -212,20 +202,12 @@ public static class IpHelper
         try
         {
             udpClient = new UdpClient();
-            
-            // 只有对多播地址才调用JoinMulticastGroup
-            byte firstByte = ipAddress.GetAddressBytes()[0];
-            bool isMulticast = firstByte >= 224 && firstByte <= 239;
-            
-            if (isMulticast)
-            {
-                udpClient.JoinMulticastGroup(ipAddress);
-            }
-            
+            JoinMulticastGroupIfNeeded(udpClient, ipAddress);
+
             var endPoint = new IPEndPoint(ipAddress, port);
-            var buffer = Encoding.Default.GetBytes("udp test");
+            var buffer = Encoding.Default.GetBytes(UdpProbeText);
             await udpClient.SendAsync(buffer, buffer.Length, endPoint);
-            
+
             return (true, string.Empty);
         }
         catch (Exception ex)
@@ -234,13 +216,7 @@ public static class IpHelper
         }
         finally
         {
-            var isAvailable = udpClient?.Client?.Available ?? 0;
-            if (isAvailable > 0) udpClient?.Client?.Shutdown(SocketShutdown.Both);
-
-            udpClient?.Client?.Close();
-            udpClient?.Client?.Dispose();
-            udpClient?.Close();
-            udpClient = null;
+            CloseUdpClient(udpClient);
         }
     }
 
@@ -280,7 +256,7 @@ public static class IpHelper
             // 224.0.2.0 - 238.255.255.255 用户可用，全网范围
             // 224.0.0.1 - 224.0.0.255 预留地址，最好不用
             ip =
-                $"{RandomExtension.GetInt(224, 238)}.{RandomExtension.GetInt(0, 255)}.{RandomExtension.GetInt(2, 255)}.{RandomExtension.GetInt(0, 255)}";
+                $"{RandomExtension.GetInt(MinMulticastFirstByte, 238)}.{RandomExtension.GetInt(0, 255)}.{RandomExtension.GetInt(2, 255)}.{RandomExtension.GetInt(0, 255)}";
             var tempPort = startPort;
 
             var udpListeners = IPGlobalProperties.GetIPGlobalProperties().GetActiveUdpListeners();
@@ -300,5 +276,33 @@ public static class IpHelper
             if (!needConnectCheck || CheckMulticastAvailability(ip, tempPort, out _)) return true;
             needConnectCheck = false;
         }
+    }
+
+    private static void JoinMulticastGroupIfNeeded(UdpClient udpClient, IPAddress ipAddress)
+    {
+        // 只有组播地址才加入组播组，普通 UDP 地址仍按原逻辑直接探测发送。
+        if (IsMulticastAddress(ipAddress))
+        {
+            udpClient.JoinMulticastGroup(ipAddress);
+        }
+    }
+
+    private static bool IsMulticastAddress(IPAddress ipAddress)
+    {
+        var firstByte = ipAddress.GetAddressBytes()[0];
+        return firstByte >= MinMulticastFirstByte && firstByte <= MaxMulticastFirstByte;
+    }
+
+    private static void CloseUdpClient(UdpClient? udpClient)
+    {
+        var isAvailable = udpClient?.Client?.Available ?? 0;
+        if (isAvailable > 0)
+        {
+            udpClient?.Client?.Shutdown(SocketShutdown.Both);
+        }
+
+        udpClient?.Client?.Close();
+        udpClient?.Client?.Dispose();
+        udpClient?.Close();
     }
 }

@@ -143,10 +143,10 @@ public class IpHelperTests
         // Assert
         Assert.False(result.Success);
         Assert.NotEmpty(result.ErrorMessage);
-        Assert.Contains("IP", result.ErrorMessage, StringComparison.OrdinalIgnoreCase); // 确保错误消息提及了IP
+        Assert.Contains("IP", result.ErrorMessage, StringComparison.OrdinalIgnoreCase); // 确保错误消息提到 IP
     }
 
-    // 保留原来的测试，确保现有的API仍然能正常工作
+    // 保留现有入口测试，确保公共 API 仍然能正常工作。
     [Theory]
     [InlineData("224.0.2.1", 7500)]
     public async Task CheckMulticastAvailabilityAsync_ShouldStillWork(string ip, int port)

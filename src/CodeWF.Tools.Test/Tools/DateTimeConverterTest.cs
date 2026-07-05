@@ -1,6 +1,5 @@
 ﻿// ReSharper disable once CheckNamespace
 using System;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CodeWF.Tools.Tests;
 
@@ -9,7 +8,7 @@ public class DateTimeConverterTest
     #region isISO8601DateTimeString
 
     [Fact(DisplayName = "should return true for valid ISO 8601 date strings")]
-    public void ShouldReturnTrueForValidISO8601DateStringgs()
+    public void ShouldReturnTrueForValidISO8601DateStrings()
     {
         Assert.True(DateTimeConverter.IsISO8601DateTimeString("2021-01-01T00:00:00.000Z"));
         Assert.True(DateTimeConverter.IsISO8601DateTimeString("2023-04-12T14:56:00+01:00"));
@@ -127,7 +126,7 @@ public class DateTimeConverterTest
     #region isTimestamp
 
     [Fact(DisplayName = "should return true for valid Unix timestamps in milliseconds")]
-    public void ShouldReturnTrueForValidUnixTmestampsInMilliseconds()
+    public void ShouldReturnTrueForValidUnixTimestampsInMilliseconds()
     {
         Assert.True(DateTimeConverter.IsTimestamp("1649792026123"));
         Assert.True(DateTimeConverter.IsTimestamp("1234567890000"));
@@ -135,7 +134,7 @@ public class DateTimeConverterTest
     }
 
     [Fact(DisplayName = "should return false for invalid Unix timestamps in milliseconds")]
-    public void ShouldTeturnFalseForInvalidUnixTimestampsInMilliseconds()
+    public void ShouldReturnFalseForInvalidUnixTimestampsInMilliseconds()
     {
         Assert.False(DateTimeConverter.IsTimestamp("foo"));
         Assert.False(DateTimeConverter.IsTimestamp(""));

@@ -56,7 +56,6 @@ public static class YamlExtensions
         {
             var deserializer = new DeserializerBuilder()
                 .Build();
-            ;
 
             obj = deserializer.Deserialize<T>(yaml);
             errorMsg = default;
@@ -70,6 +69,9 @@ public static class YamlExtensions
         }
     }
 
+    /// <summary>
+    /// 在调用方无法提前确定 YAML 类型时使用；已知模型类型时优先使用泛型 FromYaml&lt;T&gt;。
+    /// </summary>
     [RequiresDynamicCode("YamlDotNet reflection-based DeserializerBuilder is not Native AOT safe. Use YamlDotNet static source-generated deserializers for Native AOT.")]
     public static bool FromYaml(this string? yaml, out object? obj, out string? errorMsg)
     {
@@ -85,7 +87,6 @@ public static class YamlExtensions
             var deserializer = new DeserializerBuilder()
                 .WithNamingConvention(UnderscoredNamingConvention.Instance)
                 .Build();
-            ;
 
             obj = deserializer.Deserialize(yaml!);
             errorMsg = default;
@@ -100,9 +101,9 @@ public static class YamlExtensions
     }
 
     [RequiresDynamicCode("YamlDotNet reflection-based serializers are not Native AOT safe. Use YamlDotNet static source-generated serializers for Native AOT.")]
-    public static bool YamlPrettify(this string? rawYamlSting, out string? newYamlString, out string? errorMsg)
+    public static bool YamlPrettify(this string? rawYamlString, out string? newYamlString, out string? errorMsg)
     {
-        if (string.IsNullOrWhiteSpace(rawYamlSting))
+        if (string.IsNullOrWhiteSpace(rawYamlString))
         {
             newYamlString = default;
             errorMsg = "Please provide Yaml string";
@@ -120,7 +121,7 @@ public static class YamlExtensions
                 .WithIndentedSequences()
                 .Build();
 
-            var obj = deserializer.Deserialize(rawYamlSting);
+            var obj = deserializer.Deserialize(rawYamlString);
             newYamlString = serializer.Serialize(obj);
             errorMsg = default;
             return true;
