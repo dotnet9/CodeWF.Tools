@@ -2,8 +2,6 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using CodeWF.Log.Core;
-
 using CodeWF.Tools.AvaloniaDemo.ViewModels;
 using CodeWF.Tools.AvaloniaDemo.Views;
 
@@ -25,9 +23,6 @@ public partial class App : Application
             {
                 DataContext = new MainViewModel()
             };
-
-            // 程序退出前刷新日志缓冲区，确保测试过程完整落盘。
-            desktop.Exit += async (_, _) => await Logger.FlushAsync();
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {

@@ -29,8 +29,6 @@ public partial class MainView : UserControl
     {
         InitializeComponent();
 
-        // Demo 程序统一通过 UI 日志和本地文件记录测试过程，避免控制台窗口噪声。
-        Logger.EnableConsoleOutput = false;
         LogInfo("CodeWF.Tools 桌面测试台已启动");
     }
 
@@ -584,13 +582,12 @@ public partial class MainView : UserControl
 
     private static void LogInfo(string message)
     {
-        Logger.Info(message, message, log2UI: true, log2File: true, log2Console: false);
+        Logger.Info(message);
     }
 
     private static void LogError(string message, Exception exception)
     {
-        var uiMessage = $"{message}：{exception.Message}";
-        Logger.Error(uiMessage, exception, uiMessage, log2UI: true, log2File: true, log2Console: false);
+        Logger.Error(message, exception, $"{message}，请查看日志文件了解详情。");
     }
 }
 
