@@ -10,7 +10,7 @@
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Bogus" Version="35.6.5" />
-    <PackageVersion Include="CodeWF.Log.Avalonia" Version="12.1.0.18" />
+    <PackageVersion Include="CodeWF.Log.Avalonia" Version="12.1.0.19" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="Magick.NET-Q16-AnyCPU" Version="14.15.0" />
