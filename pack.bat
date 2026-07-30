@@ -10,22 +10,20 @@ set "PACKAGES_DIR=%ARTIFACTS_DIR%\packages"
 if exist "%PACKAGES_DIR%" rmdir /s /q "%PACKAGES_DIR%"
 mkdir "%PACKAGES_DIR%"
 
-echo [1/3] Restoring solution...
-dotnet restore CodeWF.Tools.slnx
-if errorlevel 1 goto :error
-
-echo [2/3] Building solution...
-dotnet build CodeWF.Tools.slnx -c %CONFIGURATION% --no-restore /p:GeneratePackageOnBuild=false
-if errorlevel 1 goto :error
-
-echo [3/3] Packing libraries...
 for %%P in (
     "src\CodeWF.Tools.Core\CodeWF.Tools.Core.csproj"
     "src\CodeWF.Tools.Files\CodeWF.Tools.Files.csproj"
     "src\CodeWF.Tools.Image\CodeWF.Tools.Image.csproj"
     "src\CodeWF.Tools\CodeWF.Tools.csproj"
 ) do (
-    dotnet pack %%~P -c %CONFIGURATION% --no-build -o "%PACKAGES_DIR%"
+    echo Restoring %%~P...
+    dotnet restore %%~P
+    if errorlevel 1 goto :error
+    echo Building %%~P...
+    dotnet build %%~P -c %CONFIGURATION% --no-restore /p:GeneratePackageOnBuild=false
+    if errorlevel 1 goto :error
+    echo Packing %%~P...
+    dotnet pack %%~P -c %CONFIGURATION% --no-build --no-restore -o "%PACKAGES_DIR%"
     if errorlevel 1 goto :error
 )
 
