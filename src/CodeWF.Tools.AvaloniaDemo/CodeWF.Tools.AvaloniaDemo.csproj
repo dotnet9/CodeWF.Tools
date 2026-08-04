@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
+    <IsPackable>false</IsPackable>
     <Title>CodeWF.Tools.Demo</Title>
     <Description>CodeWF.Tools 桌面测试程序</Description>
     <Product>CodeWF.Tools</Product>

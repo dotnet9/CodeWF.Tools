@@ -28,6 +28,6 @@
     <Using Include="Xunit" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\logo.png" Pack="true" PackagePath="" Link="logo.png" />
+    <None Include="..\..\logo.png" Link="logo.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

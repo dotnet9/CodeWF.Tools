@@ -10,13 +10,13 @@
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Bogus" Version="35.6.5" />
-    <PackageVersion Include="CodeWF.Log.Avalonia" Version="12.1.1.1" />
+    <PackageVersion Include="CodeWF.Log.Avalonia" Version="12.1.1.2" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
     <PackageVersion Include="CsvHelper" Version="33.1.0" />
     <PackageVersion Include="Magick.NET-Q16-AnyCPU" Version="14.16.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
     <PackageVersion Include="MiniExcel" Version="1.45.0" />
-    <PackageVersion Include="ReactiveUI.Avalonia" Version="12.1.0" />
+    <PackageVersion Include="ReactiveUI.Avalonia" Version="12.1.1" />
     <PackageVersion Include="SharpCompress" Version="1.0.0" />
     <PackageVersion Include="System.Configuration.ConfigurationManager" Version="10.0.10" />
     <PackageVersion Include="System.Text.Json" Version="10.0.10" />

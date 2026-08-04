@@ -8,7 +8,7 @@ public class ImageHelperTest
     [Fact]
     public async Task Test_MergeGenerateIcon_Success()
     {
-        var sourceImage = "../../logo.png";
+        var sourceImage = Path.Combine(AppContext.BaseDirectory, "logo.png");
         Assert.True(File.Exists(sourceImage));
 
         var destIconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logo.ico");
@@ -24,7 +24,7 @@ public class ImageHelperTest
     [Fact]
     public async Task Test_SeparateGenerateIcon_Success()
     {
-        var sourceImage = "../../logo.png";
+        var sourceImage = Path.Combine(AppContext.BaseDirectory, "logo.png");
         Assert.True(File.Exists(sourceImage));
 
         var destIconFolder = AppDomain.CurrentDomain.BaseDirectory;
