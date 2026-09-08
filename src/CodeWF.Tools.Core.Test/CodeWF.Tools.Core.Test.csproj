@@ -4,6 +4,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <!-- Keep the existing VSTest workflow with xUnit 4. -->
+    <IsTestingPlatformApplication>false</IsTestingPlatformApplication>
+    <TestingPlatformDisableCustomTestTarget>true</TestingPlatformDisableCustomTestTarget>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="coverlet.collector">
