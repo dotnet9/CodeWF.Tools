@@ -7,6 +7,7 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using System.Globalization;
 using CodeWF.Tools.Extensions;
 
 namespace CodeWF.Tools.Helpers;
@@ -16,6 +17,8 @@ public static class IpHelper
     private const string UdpProbeText = "udp test";
     private const int MinMulticastFirstByte = 224;
     private const int MaxMulticastFirstByte = 239;
+    private const int MinPort = 1;
+    private const int MaxPort = 65535;
 
     /// <summary>
     ///     获取本地IP地址详细信息
@@ -81,19 +84,43 @@ public static class IpHelper
             return false;
         }
 
-        var parts = ipPort.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        if (parts.Length != 2 || !IPAddress.TryParse(parts[0], out _))
+        string ipPart;
+        string portPart;
+        if (separator == ':' && ipPort.StartsWith('[', StringComparison.Ordinal))
+        {
+            var closingBracket = ipPort.IndexOf("]:", StringComparison.Ordinal);
+            if (closingBracket <= 1)
+            {
+                return false;
+            }
+
+            ipPart = ipPort[1..closingBracket];
+            portPart = ipPort[(closingBracket + 2)..].Trim();
+        }
+        else
+        {
+            var parts = ipPort.Split(separator, StringSplitOptions.TrimEntries);
+            if (parts.Length != 2)
+            {
+                return false;
+            }
+
+            ipPart = parts[0];
+            portPart = parts[1];
+        }
+
+        if (string.IsNullOrWhiteSpace(ipPart) || !IPAddress.TryParse(ipPart, out _))
         {
             return false;
         }
 
-        if (!int.TryParse(parts[1], out port))
+        if (!TryParsePort(portPart, out port))
         {
             port = 0;
             return false;
         }
 
-        ip = parts[0];
+        ip = ipPart;
         return true;
     }
 
@@ -110,19 +137,24 @@ public static class IpHelper
             return false;
         }
 
-        var parts = ipPort.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        if (parts.Length != 2)
+        if (string.IsNullOrEmpty(separator))
         {
             return false;
         }
 
-        var parsedIps = parts[0].Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        if (parsedIps.Length == 0 || parsedIps.Any(ip => !IPAddress.TryParse(ip, out _)))
+        var parts = ipPort.Split(separator, StringSplitOptions.TrimEntries);
+        if (parts.Length != 2 || string.IsNullOrWhiteSpace(parts[0]) || string.IsNullOrWhiteSpace(parts[1]))
         {
             return false;
         }
 
-        if (!int.TryParse(parts[1], out port))
+        var parsedIps = parts[0].Split(',', StringSplitOptions.TrimEntries);
+        if (parsedIps.Length == 0 || parsedIps.Any(ip => string.IsNullOrWhiteSpace(ip) || !IPAddress.TryParse(ip, out _)))
+        {
+            return false;
+        }
+
+        if (!TryParsePort(parts[1], out port))
         {
             port = 0;
             return false;
@@ -130,6 +162,12 @@ public static class IpHelper
 
         ips.AddRange(parsedIps);
         return true;
+    }
+
+    private static bool TryParsePort(string value, out int port)
+    {
+        return int.TryParse(value, NumberStyles.None, CultureInfo.InvariantCulture, out port) &&
+               port is >= MinPort and <= MaxPort;
     }
 
     /// <summary>

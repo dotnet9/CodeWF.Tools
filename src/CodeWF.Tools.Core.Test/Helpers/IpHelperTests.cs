@@ -90,6 +90,36 @@ public class IpHelperTests
     }
 
     [Theory]
+    [InlineData("127.0.0.1:0")]
+    [InlineData("127.0.0.1:-1")]
+    [InlineData("127.0.0.1:65536")]
+    [InlineData("127.0.0.1::2701")]
+    [InlineData("127.0.0.1:")]
+    public void TrySplitIpPort_WithInvalidPort_ShouldReject(string ipPort)
+    {
+        Assert.False(IpHelper.TrySplitIpPort(ipPort, out _, out _));
+    }
+
+    [Fact]
+    public void TrySplitIpPort_WithBracketedIpv6_ShouldParse()
+    {
+        var result = IpHelper.TrySplitIpPort("[::1]:2701", out var ip, out var port);
+
+        Assert.True(result);
+        Assert.Equal("::1", ip);
+        Assert.Equal(2701, port);
+    }
+
+    [Theory]
+    [InlineData("127.0.0.1,,192.168.1.2;2701")]
+    [InlineData("127.0.0.1,192.168.1.2;65536")]
+    [InlineData("127.0.0.1,192.168.1.2;")]
+    public void TrySplitIpPorts_WithInvalidInput_ShouldReject(string ipPort)
+    {
+        Assert.False(IpHelper.TrySplitIpPorts(ipPort, out _, out _));
+    }
+
+    [Theory]
     [InlineData("224.0.2.1", 7500)] // Valid multicast address
     [InlineData("224.1.1.1", 7600)] // Another valid multicast address
     [InlineData("239.255.255.255", 7700)] // Upper boundary of local multicast range
