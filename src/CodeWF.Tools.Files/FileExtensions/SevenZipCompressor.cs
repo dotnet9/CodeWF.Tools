@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Text;
 using System.Web;
 using SharpCompress.Archives.Zip;
-using SharpCompress.Readers;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +37,7 @@ public class SevenZipCompressor : ISevenZipCompressor
     /// <param name="ignoreEmptyDir">忽略空文件夹</param>
     public void Decompress(string compressedFile, string dir, bool ignoreEmptyDir = true)
     {
-        Decompress(compressedFile, dir);
+        DecompressCore(compressedFile, dir, ignoreEmptyDir);
     }
 
     /// <summary>
@@ -48,16 +47,78 @@ public class SevenZipCompressor : ISevenZipCompressor
     /// <param name="dir">解压到...</param>
     public void Decompress(string compressedFile, string dir)
     {
+        DecompressCore(compressedFile, dir, ignoreEmptyDir: true);
+    }
+
+    private static void DecompressCore(string compressedFile, string dir, bool ignoreEmptyDir)
+    {
         if (string.IsNullOrEmpty(dir))
         {
             dir = Path.GetDirectoryName(compressedFile) ?? Directory.GetCurrentDirectory();
         }
 
-        ArchiveFactory.WriteToDirectory(compressedFile, Directory.CreateDirectory(dir).FullName, new ExtractionOptions()
+        var destinationDirectory = Directory.CreateDirectory(dir).FullName;
+        using var archive = ArchiveFactory.Open(compressedFile);
+        var entries = archive.Entries.ToList();
+        var extractionPaths = entries
+            .Select(entry => (Entry: entry, Path: GetSafeExtractionPath(destinationDirectory, entry.Key)))
+            .ToList();
+
+        foreach (var (entry, path) in extractionPaths)
         {
-            ExtractFullPath = true,
-            Overwrite = true
-        });
+            if (!string.IsNullOrEmpty(entry.LinkTarget))
+            {
+                throw new InvalidDataException($"Symbolic link entries are not supported: {entry.Key}");
+            }
+
+            if (entry.IsDirectory)
+            {
+                if (!ignoreEmptyDir)
+                {
+                    Directory.CreateDirectory(path);
+                }
+
+                continue;
+            }
+
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            entry.WriteToFile(path, new ExtractionOptions
+            {
+                ExtractFullPath = false,
+                Overwrite = true
+            });
+        }
+    }
+
+    private static string GetSafeExtractionPath(string destinationDirectory, string? entryKey)
+    {
+        if (string.IsNullOrWhiteSpace(entryKey))
+        {
+            throw new InvalidDataException("Archive entry path cannot be empty.");
+        }
+
+        if (entryKey.Contains('\0'))
+        {
+            throw new InvalidDataException("Archive entry path cannot contain null characters.");
+        }
+
+        var relativePath = entryKey.Replace('/', Path.DirectorySeparatorChar)
+            .Replace('\\', Path.DirectorySeparatorChar);
+        if (Path.IsPathRooted(relativePath) || !string.IsNullOrEmpty(Path.GetPathRoot(relativePath)))
+        {
+            throw new InvalidDataException($"Archive entry path is absolute: {entryKey}");
+        }
+
+        var fullPath = Path.GetFullPath(Path.Combine(destinationDirectory, relativePath));
+        var relativeToDestination = Path.GetRelativePath(destinationDirectory, fullPath);
+        if (relativeToDestination == ".." ||
+            relativeToDestination.StartsWith($"..{Path.DirectorySeparatorChar}", StringComparison.Ordinal) ||
+            Path.IsPathRooted(relativeToDestination))
+        {
+            throw new InvalidDataException($"Archive entry path escapes the destination directory: {entryKey}");
+        }
+
+        return fullPath;
     }
 
     /// <summary>
