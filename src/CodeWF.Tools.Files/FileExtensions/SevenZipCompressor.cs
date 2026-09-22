@@ -175,7 +175,7 @@ public class SevenZipCompressor : ISevenZipCompressor
         }).OfType<Uri>().ToList();
         foreach (var pair in dic)
         {
-            archive.AddEntry(Path.Combine(rootdir, pair.Value), pair.Key);
+            archive.AddEntry(CombineArchiveEntryPath(rootdir, pair.Value), pair.Key);
         }
 
         if (remoteUrls.Any())
@@ -205,7 +205,7 @@ public class SevenZipCompressor : ISevenZipCompressor
             var stream = new MemoryStream();
             await res.Content.CopyToAsync(stream);
             stream.Position = 0;
-            var entryName = Path.Combine(rootdir, Path.GetFileName(HttpUtility.UrlDecode(url.AbsolutePath)));
+            var entryName = CombineArchiveEntryPath(rootdir, Path.GetFileName(HttpUtility.UrlDecode(url.AbsolutePath)));
             streams[entryName] = stream;
         });
 
@@ -221,41 +221,72 @@ public class SevenZipCompressor : ISevenZipCompressor
     private Dictionary<string, string> GetFileEntryMaps(IEnumerable<string> files)
     {
         var fileList = new List<string>();
-        void GetFilesRecurs(string path)
+        foreach (var file in files.Where(s => !s.StartsWith("http", StringComparison.OrdinalIgnoreCase)))
         {
-            //遍历目标文件夹的所有文件
-            fileList.AddRange(Directory.GetFiles(path));
-
-            //遍历目标文件夹的所有文件夹
-            foreach (var directory in Directory.GetDirectories(path))
+            if (Directory.Exists(file))
             {
-                GetFilesRecurs(directory);
-            }
-        }
-
-        files.Where(s => !s.StartsWith("http", StringComparison.OrdinalIgnoreCase)).ToList().ForEach(s =>
-        {
-            if (Directory.Exists(s))
-            {
-                GetFilesRecurs(s);
+                fileList.AddRange(Directory.EnumerateFiles(file, "*", SearchOption.AllDirectories));
             }
             else
             {
-                fileList.Add(s);
+                fileList.Add(file);
             }
-        });
+        }
 
         if (!fileList.Any())
         {
             return new Dictionary<string, string>();
         }
 
-        var dirname = new string(fileList.First().Substring(0, fileList.Min(s => s.Length)).TakeWhile((c, i) => fileList.All(s => s[i] == c)).ToArray());
-        if (!Directory.Exists(dirname))
+        var pathComparer = OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+        var uniqueFiles = fileList
+            .Select(Path.GetFullPath)
+            .Distinct(pathComparer)
+            .ToList();
+        var commonDirectory = Path.GetDirectoryName(uniqueFiles[0])!;
+        var commonRoot = Path.GetPathRoot(commonDirectory);
+        if (uniqueFiles.Any(file => !string.Equals(Path.GetPathRoot(file), commonRoot,
+                OperatingSystem.IsWindows() ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)))
         {
-            dirname = Directory.GetParent(dirname)?.FullName ?? Directory.GetCurrentDirectory();
+            throw new InvalidOperationException("Files on different volume roots cannot be added to one archive.");
         }
 
-        return fileList.ToDictionary(s => s, s => s.Substring(dirname.Length));
+        foreach (var file in uniqueFiles.Skip(1))
+        {
+            var fileDirectory = Path.GetDirectoryName(file)!;
+            while (!IsPathWithin(commonDirectory, fileDirectory))
+            {
+                var parent = Directory.GetParent(commonDirectory)?.FullName;
+                if (parent is null)
+                {
+                    break;
+                }
+
+                commonDirectory = parent;
+            }
+        }
+
+        return uniqueFiles.ToDictionary(
+            file => file,
+            file => Path.GetRelativePath(commonDirectory, file),
+            pathComparer);
+    }
+
+    private static bool IsPathWithin(string rootDirectory, string path)
+    {
+        var relativePath = Path.GetRelativePath(rootDirectory, path);
+        return relativePath == "." ||
+               (!Path.IsPathRooted(relativePath) &&
+                relativePath != ".." &&
+                !relativePath.StartsWith($"..{Path.DirectorySeparatorChar}", StringComparison.Ordinal));
+    }
+
+    private static string CombineArchiveEntryPath(string rootdir, string entryPath)
+    {
+        var normalizedRoot = rootdir.Trim('/', '\\');
+        var normalizedEntry = entryPath.Replace('\\', '/');
+        return string.IsNullOrEmpty(normalizedRoot)
+            ? normalizedEntry
+            : $"{normalizedRoot}/{normalizedEntry}";
     }
 }

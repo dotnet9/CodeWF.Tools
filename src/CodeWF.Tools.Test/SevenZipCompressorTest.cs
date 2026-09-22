@@ -59,6 +59,30 @@ public class SevenZipCompressorTest
         }
     }
 
+    [Fact]
+    public void Zip_ShouldUseRelativeEntryPathForSingleFile()
+    {
+        var tempDirectory = CreateTempDirectory();
+        try
+        {
+            var sourcePath = Path.Combine(tempDirectory, "single.txt");
+            File.WriteAllText(sourcePath, "content");
+            var archivePath = Path.Combine(tempDirectory, "single.zip");
+            var outputDirectory = Path.Combine(tempDirectory, "output");
+            using var httpClient = new HttpClient();
+            var compressor = new SevenZipCompressor(httpClient);
+
+            compressor.Zip(new[] { sourcePath }, archivePath);
+            compressor.Decompress(archivePath, outputDirectory);
+
+            Assert.Equal("content", File.ReadAllText(Path.Combine(outputDirectory, "single.txt")));
+        }
+        finally
+        {
+            Directory.Delete(tempDirectory, recursive: true);
+        }
+    }
+
     private static string CreateTempDirectory()
     {
         var directory = Path.Combine(Path.GetTempPath(), $"codewf-compressor-{Guid.NewGuid():N}");
