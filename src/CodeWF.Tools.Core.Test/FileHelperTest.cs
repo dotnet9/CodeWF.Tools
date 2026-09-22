@@ -52,5 +52,23 @@ namespace CodeWF.Tools.Core.Test
                 }
             }
         }
+
+        [Fact]
+        public void Test_CheckShortFileCode_Success()
+        {
+            var filePath = Path.Combine(Path.GetTempPath(), $"codewf-short-{Guid.NewGuid():N}.txt");
+            try
+            {
+                File.WriteAllBytes(filePath, [0x61]);
+
+                var detectedEncoding = FileHelper.GetFileEncodeType(filePath);
+
+                Assert.Equal(Encoding.UTF8, detectedEncoding);
+            }
+            finally
+            {
+                File.Delete(filePath);
+            }
+        }
     }
 }

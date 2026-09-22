@@ -248,84 +248,83 @@ public static class FileHelper
     public static Encoding GetFileEncodeType(string filename)
     {
         using var fs = new FileStream(filename, FileMode.Open, FileAccess.Read);
-        // 读取文件前几个字节以检查 BOM
         var bom = new byte[4];
-        fs.ReadExactly(bom, 0, bom.Length);
+        var bytesRead = fs.Read(bom, 0, bom.Length);
         fs.Position = 0;
 
-        switch (bom[0])
+        if (bytesRead >= 4)
         {
-            // 检查 UTF-8 BOM
-            case 0xEF when bom[1] == 0xBB && bom[2] == 0xBF:
-                return Encoding.UTF8;
-            // 检查 UTF-16 Big Endian BOM
-            case 0xFE when bom[1] == 0xFF:
-                return Encoding.BigEndianUnicode;
-            // 检查 UTF-16 Little Endian BOM
-            case 0xFF when bom[1] == 0xFE:
-                return Encoding.Unicode;
-            // 检查 UTF-32 Big Endian BOM
-            case 0x00 when bom[1] == 0x00 && bom[2] == 0xFE && bom[3] == 0xFF:
+            if (bom[0] == 0xFF && bom[1] == 0xFE && bom[2] == 0x00 && bom[3] == 0x00)
+            {
                 return Encoding.UTF32;
-            // 检查 UTF-32 Little Endian BOM
-            case 0xFF when bom[1] == 0xFE && bom[2] == 0x00 && bom[3] == 0x00:
+            }
+
+            if (bom[0] == 0x00 && bom[1] == 0x00 && bom[2] == 0xFE && bom[3] == 0xFF)
+            {
                 return Encoding.GetEncoding("UTF-32BE");
+            }
         }
 
-        // 没有 BOM，尝试不同编码读取
-        Encoding[] encodings =
-        [
-            Encoding.UTF8,
-            Encoding.GetEncoding("GB2312"),
-            Encoding.Default
-        ];
+        if (bytesRead >= 3 && bom[0] == 0xEF && bom[1] == 0xBB && bom[2] == 0xBF)
+        {
+            return Encoding.UTF8;
+        }
 
-        const int bufferSize = 8192; // 每次读取的缓冲区大小
+        if (bytesRead >= 2 && bom[0] == 0xFE && bom[1] == 0xFF)
+        {
+            return Encoding.BigEndianUnicode;
+        }
+
+        if (bytesRead >= 2 && bom[0] == 0xFF && bom[1] == 0xFE)
+        {
+            return Encoding.Unicode;
+        }
+
+        if (bytesRead == 0)
+        {
+            return Encoding.UTF8;
+        }
+
+        var encodings = new[]
+        {
+            (Public: Encoding.UTF8, Strict: CreateStrictEncoding(Encoding.UTF8)),
+            (Public: Encoding.GetEncoding("GB2312"), Strict: CreateStrictEncoding(Encoding.GetEncoding("GB2312"))),
+            (Public: Encoding.Default, Strict: CreateStrictEncoding(Encoding.Default))
+        };
+
+        const int bufferSize = 8192;
         var buffer = new byte[bufferSize];
 
-        foreach (var encoding in encodings)
+        foreach (var (publicEncoding, strictEncoding) in encodings)
         {
-            fs.Position = 0; // 重置文件流位置
-            var isEncodingCorrect = true;
-
-            int bytesRead;
-            while ((bytesRead = fs.Read(buffer, 0, bufferSize)) > 0)
+            fs.Position = 0;
+            try
             {
-                try
+                var decoder = strictEncoding.GetDecoder();
+                var chars = new char[strictEncoding.GetMaxCharCount(bufferSize)];
+                int read;
+                while ((read = fs.Read(buffer, 0, buffer.Length)) > 0)
                 {
-                    // 使用当前编码将读取的字节内容解码为字符串
-                    var decodedString = encoding.GetString(buffer, 0, bytesRead);
-                    // 再将解码后的字符串使用相同编码重新编码为字节数组
-                    var reEncodedBytes = encoding.GetBytes(decodedString);
-
-                    // 比较重新编码后的字节数组与原始读取的字节内容是否一致
-                    for (var i = 0; i < bytesRead; i++)
-                    {
-                        if (buffer[i] == reEncodedBytes[i]) continue;
-                        isEncodingCorrect = false;
-                        break;
-                    }
-
-                    if (!isEncodingCorrect)
-                    {
-                        break;
-                    }
+                    decoder.Convert(buffer, 0, read, chars, 0, chars.Length, false,
+                        out _, out _, out _);
                 }
-                catch (DecoderFallbackException)
-                {
-                    isEncodingCorrect = false;
-                    break;
-                }
+
+                decoder.Convert([], 0, 0, chars, 0, chars.Length, true, out _, out _, out _);
+                return publicEncoding;
             }
-
-            if (isEncodingCorrect)
+            catch (DecoderFallbackException)
             {
-                return encoding;
+                // Try the next candidate encoding.
             }
         }
 
-        // 都失败了，返回默认编码
-        return Encoding.Default;
+        return Encoding.UTF8;
+    }
+
+    private static Encoding CreateStrictEncoding(Encoding encoding)
+    {
+        return Encoding.GetEncoding(encoding.CodePage, EncoderFallback.ExceptionFallback,
+            DecoderFallback.ExceptionFallback);
     }
 
     /// <summary>
