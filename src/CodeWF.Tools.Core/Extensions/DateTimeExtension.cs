@@ -9,21 +9,13 @@ namespace CodeWF.Tools.Extensions
     /// </summary>
     public static class DateTimeExtension
     {
-        private static readonly DateTimeOffset UnixEpochStart = new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero);
-
-        // 1天的毫秒数
-        private const long MillisecondsPerDay = 24 * 60 * 60 * 1000;
-
-        // uint能表示的最大天数
-        private const double MaxDaysForUint = uint.MaxValue / (double)MillisecondsPerDay;
-
         /// <summary>
         /// 获取该时间相对于1970-01-01T00:00:00Z的秒数，默认使用当前系统时区的偏移量，比如北京时间的TimeSpan.FromHours(8)
         /// </summary>
         /// <param name="dt"></param>
         /// <returns></returns>
         public static long GetUnixTimeSeconds(this DateTime dt) =>
-            dt.GetUnixTimeSeconds(TimeZoneInfo.Local.BaseUtcOffset);
+            CreateLocalDateTimeOffset(dt).ToUnixTimeSeconds();
 
         /// <summary>
         /// 获取该时间相对于1970-01-01T00:00:00Z的秒数
@@ -32,7 +24,7 @@ namespace CodeWF.Tools.Extensions
         /// <param name="offset"></param>
         /// <returns></returns>
         public static long GetUnixTimeSeconds(this DateTime dt, TimeSpan offset) =>
-            new DateTimeOffset(dt, offset).ToUnixTimeSeconds();
+            CreateDateTimeOffset(dt, offset).ToUnixTimeSeconds();
 
         /// <summary>
         /// 获取该时间相对于1970-01-01T00:00:00Z的秒数
@@ -50,7 +42,7 @@ namespace CodeWF.Tools.Extensions
         public static uint GetSpecialUnixTimeSeconds(this DateTime dt, int startYear)
         {
             return dt.GetSpecialUnixTimeSeconds(
-                dt.Kind == DateTimeKind.Utc ? TimeSpan.Zero : TimeZoneInfo.Local.BaseUtcOffset, startYear);
+                GetLocalOffset(dt), startYear);
         }
 
         /// <summary>
@@ -61,7 +53,7 @@ namespace CodeWF.Tools.Extensions
         /// <param name="startYear"></param>
         /// <returns></returns>
         public static uint GetSpecialUnixTimeSeconds(this DateTime dt, TimeSpan offset, int startYear) =>
-            (uint)((new DateTimeOffset(dt, offset).UtcDateTime.Ticks -
+            (uint)((CreateDateTimeOffset(dt, offset).UtcDateTime.Ticks -
                     new DateTimeOffset(startYear, 1, 1, 0, 0, 0, TimeSpan.Zero).UtcDateTime.Ticks) / 1_000_000L);
 
         /// <summary>
@@ -84,7 +76,7 @@ namespace CodeWF.Tools.Extensions
         public static ulong GetSpecialUnixTimeMilliseconds(this DateTime dt, int startYear)
         {
             return dt.GetSpecialUnixTimeMilliseconds(
-                dt.Kind == DateTimeKind.Utc ? TimeSpan.Zero : TimeZoneInfo.Local.BaseUtcOffset, startYear);
+                GetLocalOffset(dt), startYear);
         }
 
         /// <summary>
@@ -95,7 +87,7 @@ namespace CodeWF.Tools.Extensions
         /// <param name="startYear"></param>
         /// <returns></returns>
         public static ulong GetSpecialUnixTimeMilliseconds(this DateTime dt, TimeSpan offset, int startYear) =>
-            (uint)((new DateTimeOffset(dt, offset).UtcDateTime.Ticks -
+            (uint)((CreateDateTimeOffset(dt, offset).UtcDateTime.Ticks -
                     new DateTimeOffset(startYear, 1, 1, 0, 0, 0, TimeSpan.Zero).UtcDateTime.Ticks) / 10_000L);
 
         /// <summary>
@@ -116,16 +108,7 @@ namespace CodeWF.Tools.Extensions
         /// <returns>毫秒间隔</returns>
         public static uint GetTimeIntervalMilliseconds(this DateTime endDt, DateTime startDt)
         {
-            // 统一转换为UTC时间进行比较
-            var endUtc = endDt.Kind == DateTimeKind.Local ? endDt.ToUniversalTime() :
-                         endDt.Kind == DateTimeKind.Unspecified ? DateTime.SpecifyKind(endDt, DateTimeKind.Utc) :
-                         endDt;
-                         
-            var startUtc = startDt.Kind == DateTimeKind.Local ? startDt.ToUniversalTime() :
-                           startDt.Kind == DateTimeKind.Unspecified ? DateTime.SpecifyKind(startDt, DateTimeKind.Utc) :
-                           startDt;
-
-            var interval = endUtc - startUtc;
+            var interval = CreateIntervalDateTimeOffset(endDt) - CreateIntervalDateTimeOffset(startDt);
             CheckForPrecisionLoss(interval);
             return (uint)interval.TotalMilliseconds;
         }
@@ -161,17 +144,45 @@ namespace CodeWF.Tools.Extensions
 
         private static DateTimeOffset CreateDateTimeOffset(DateTime dt, TimeSpan offset)
         {
-            if (dt.Kind == DateTimeKind.Local)
-            {
-                dt = DateTime.SpecifyKind(dt, DateTimeKind.Unspecified);
-            }
+            return new DateTimeOffset(DateTime.SpecifyKind(dt, DateTimeKind.Unspecified), offset);
+        }
 
-            return new DateTimeOffset(dt, offset);
+        private static DateTimeOffset CreateLocalDateTimeOffset(DateTime dt)
+        {
+            return dt.Kind switch
+            {
+                DateTimeKind.Utc => new DateTimeOffset(dt),
+                DateTimeKind.Local => new DateTimeOffset(dt),
+                _ => CreateDateTimeOffset(dt, TimeZoneInfo.Local.GetUtcOffset(dt))
+            };
+        }
+
+        private static DateTimeOffset CreateIntervalDateTimeOffset(DateTime dt)
+        {
+            return dt.Kind == DateTimeKind.Unspecified
+                ? new DateTimeOffset(DateTime.SpecifyKind(dt, DateTimeKind.Utc))
+                : new DateTimeOffset(dt);
+        }
+
+        private static TimeSpan GetLocalOffset(DateTime dt) =>
+            dt.Kind == DateTimeKind.Utc ? TimeSpan.Zero : TimeZoneInfo.Local.GetUtcOffset(dt);
+
+        private static TimeSpan GetSpecialLocalOffset(uint specialSeconds, int startYear)
+        {
+            var utcTime = new DateTimeOffset(startYear, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                .AddTicks((long)specialSeconds * 1_000_000L)
+                .UtcDateTime;
+            return TimeZoneInfo.Local.GetUtcOffset(utcTime);
         }
 
         private static void CheckForPrecisionLoss(TimeSpan interval)
         {
-            if (interval.TotalDays > MaxDaysForUint)
+            if (interval < TimeSpan.Zero)
+            {
+                throw new ArgumentOutOfRangeException(nameof(interval), "结束时间不能早于开始时间");
+            }
+
+            if (interval.TotalMilliseconds > uint.MaxValue)
             {
                 throw new OverflowException("时间间隔过大，转换为uint类型时会丢失精度");
             }
@@ -183,7 +194,7 @@ namespace CodeWF.Tools.Extensions
         /// <param name="dt"></param>
         /// <returns></returns>
         public static long GetUnixTimeMilliseconds(this DateTime dt) =>
-            dt.GetUnixTimeMilliseconds(TimeZoneInfo.Local.BaseUtcOffset);
+            CreateLocalDateTimeOffset(dt).ToUnixTimeMilliseconds();
 
         /// <summary>
         /// 获取该时间相对于1970-01-01T00:00:00Z的毫秒数
@@ -192,7 +203,7 @@ namespace CodeWF.Tools.Extensions
         /// <param name="offset"></param>
         /// <returns></returns>
         public static long GetUnixTimeMilliseconds(this DateTime dt, TimeSpan offset) =>
-            new DateTimeOffset(dt, offset).ToUnixTimeMilliseconds();
+            CreateDateTimeOffset(dt, offset).ToUnixTimeMilliseconds();
 
         /// <summary>
         /// 获取该时间相对于1970-01-01T00:00:00Z的毫秒数
@@ -207,7 +218,7 @@ namespace CodeWF.Tools.Extensions
         /// <param name="seconds"></param>
         /// <returns></returns>
         public static DateTime FromUnixTimeSecondsToDateTime(this long seconds) =>
-            UnixEpochStart.UtcDateTime.AddSeconds(seconds).ToLocalTime();
+            DateTimeOffset.FromUnixTimeSeconds(seconds).ToLocalTime().DateTime;
 
 
         /// <summary>
@@ -216,7 +227,7 @@ namespace CodeWF.Tools.Extensions
         /// <param name="seconds"></param>
         /// <returns></returns>
         public static DateTimeOffset FromUnixTimeSecondsToDateTimeOffset(this long seconds) =>
-            UnixEpochStart.UtcDateTime.AddSeconds(seconds);
+            DateTimeOffset.FromUnixTimeSeconds(seconds);
 
         /// <summary>
         /// 将相对于1970-01-01T00:00:00Z的精确到0.1秒的特殊时间戳转换为DateTime, 默认使用当前系统时区的偏移量，比如北京时间的TimeSpan.FromHours(8)
@@ -226,7 +237,8 @@ namespace CodeWF.Tools.Extensions
         /// <returns></returns>
         public static DateTime FromSpecialUnixTimeSecondsToDateTime(this uint specialSeconds,
             int startYear) =>
-            specialSeconds.FromSpecialUnixTimeSecondsToDateTime(TimeZoneInfo.Local.BaseUtcOffset, startYear);
+            specialSeconds.FromSpecialUnixTimeSecondsToDateTime(
+                GetSpecialLocalOffset(specialSeconds, startYear), startYear);
 
         public const int StartYear = 2024;
 
@@ -272,8 +284,7 @@ namespace CodeWF.Tools.Extensions
         /// <returns>结束时间</returns>
         public static DateTime GetEndDateTime(this DateTime startDt, uint milliseconds)
         {
-            var offset = startDt.Kind == DateTimeKind.Utc ? TimeSpan.Zero : TimeZoneInfo.Local.BaseUtcOffset;
-            var startOffset = CreateDateTimeOffset(startDt, offset);
+            var startOffset = CreateLocalDateTimeOffset(startDt);
             var endOffset = startOffset.AddMilliseconds(milliseconds);
             return endOffset.DateTime;
         }
@@ -310,7 +321,7 @@ namespace CodeWF.Tools.Extensions
         /// <param name="offset"></param>
         /// <returns></returns>
         public static DateTime FromUnixTimeMillisecondsToDateTime(this long milliseconds) =>
-            milliseconds.FromUnixTimeMillisecondsToDateTime(TimeZoneInfo.Local.BaseUtcOffset);
+            DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).ToLocalTime().DateTime;
 
         /// <summary>
         /// 将相对于1970-01-01T00:00:00Z的毫秒数转换为DateTime
@@ -319,7 +330,7 @@ namespace CodeWF.Tools.Extensions
         /// <param name="offset"></param>
         /// <returns></returns>
         public static DateTime FromUnixTimeMillisecondsToDateTime(this long milliseconds, TimeSpan offset) =>
-            UnixEpochStart.UtcDateTime.AddMilliseconds(milliseconds) + offset;
+            DateTimeOffset.FromUnixTimeMilliseconds(milliseconds).ToOffset(offset).DateTime;
 
         /// <summary>
         /// 将相对于1970-01-01T00:00:00Z的毫秒数转换为DateTimeOffset
@@ -327,7 +338,7 @@ namespace CodeWF.Tools.Extensions
         /// <param name="milliseconds"></param>
         /// <returns></returns>
         public static DateTimeOffset FromUnixTimeMillisecondsToDateTimeOffset(this long milliseconds) =>
-            UnixEpochStart.UtcDateTime.AddMilliseconds(milliseconds);
+            DateTimeOffset.FromUnixTimeMilliseconds(milliseconds);
 
         /// <summary>
         /// 获取某一年有多少周

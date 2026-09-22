@@ -33,6 +33,27 @@ public class DateTimeExtensionsTests
     }
 
     [Fact]
+    public void GetTimeIntervalMilliseconds_EndBeforeStart_Throws()
+    {
+        var start = new DateTime(2024, 1, 1, 0, 0, 1, DateTimeKind.Utc);
+        var end = start.AddSeconds(-1);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => end.GetTimeIntervalMilliseconds(start));
+    }
+
+    [Fact]
+    public void GetUnixTimeMilliseconds_ExplicitOffset_UsesSuppliedOffset()
+    {
+        var localTime = new DateTime(2024, 1, 1, 8, 0, 0, DateTimeKind.Utc);
+
+        var actual = localTime.GetUnixTimeMilliseconds(TimeSpan.FromHours(8));
+        var expected = new DateTimeOffset(2024, 1, 1, 8, 0, 0, TimeSpan.FromHours(8))
+            .ToUnixTimeMilliseconds();
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
     public void GetEndDateTime_DefaultOffset()
     {
         var start = DateTime.Now;
