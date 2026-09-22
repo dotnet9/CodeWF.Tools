@@ -4,6 +4,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <!-- Keep the existing VSTest workflow with xUnit v3. -->
+    <IsTestingPlatformApplication>false</IsTestingPlatformApplication>
+    <TestingPlatformDisableCustomTestTarget>true</TestingPlatformDisableCustomTestTarget>
     <LangVersion>latest</LangVersion>
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
