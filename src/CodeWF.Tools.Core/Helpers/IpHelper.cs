@@ -87,7 +87,7 @@ public static class IpHelper
 
         string ipPart;
         string portPart;
-        if (separator == ':' && ipPort.StartsWith('[', StringComparison.Ordinal))
+        if (separator == ':' && ipPort.Length > 0 && ipPort[0] == '[')
         {
             var closingBracket = ipPort.IndexOf("]:", StringComparison.Ordinal);
             if (closingBracket <= 1)
