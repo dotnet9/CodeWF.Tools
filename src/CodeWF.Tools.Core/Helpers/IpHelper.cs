@@ -19,6 +19,7 @@ public static class IpHelper
     private const int MaxMulticastFirstByte = 239;
     private const int MinPort = 1;
     private const int MaxPort = 65535;
+    private const int MaxMulticastProbeAttempts = 32;
 
     /// <summary>
     ///     获取本地IP地址详细信息
@@ -200,6 +201,18 @@ public static class IpHelper
             return false;
         }
 
+        if (ipAddress.AddressFamily != AddressFamily.InterNetwork)
+        {
+            errorMsg = $"IP地址 '{ip}' 必须是 IPv4 地址";
+            return false;
+        }
+
+        if (port is < MinPort or > MaxPort)
+        {
+            errorMsg = $"端口 '{port}' 超出有效范围 {MinPort}-{MaxPort}";
+            return false;
+        }
+
         UdpClient? udpClient = null;
         try
         {
@@ -234,6 +247,16 @@ public static class IpHelper
         if (!IPAddress.TryParse(ip, out var ipAddress))
         {
             return (false, $"IP地址 '{ip}' 格式无效");
+        }
+
+        if (ipAddress.AddressFamily != AddressFamily.InterNetwork)
+        {
+            return (false, $"IP地址 '{ip}' 必须是 IPv4 地址");
+        }
+
+        if (port is < MinPort or > MaxPort)
+        {
+            return (false, $"端口 '{port}' 超出有效范围 {MinPort}-{MaxPort}");
         }
 
         UdpClient? udpClient = null;
@@ -282,19 +305,31 @@ public static class IpHelper
     public static bool GetMulticastIpAndPort(out string ip, out int port, int startPort = 7000, int endPort = 7999,
         bool needConnectCheck = false)
     {
+        if (startPort is < MinPort or > MaxPort)
+        {
+            throw new ArgumentOutOfRangeException(nameof(startPort), $"startPort must be between {MinPort} and {MaxPort}.");
+        }
+
+        if (endPort is < MinPort or > MaxPort)
+        {
+            throw new ArgumentOutOfRangeException(nameof(endPort), $"endPort must be between {MinPort} and {MaxPort}.");
+        }
+
         if (startPort > endPort)
         {
             throw new ArgumentOutOfRangeException(nameof(startPort), "startPort must be less than or equal to endPort.");
         }
 
-        while (true)
+        ip = string.Empty;
+        port = 0;
+        for (var attempt = 0; attempt < MaxMulticastProbeAttempts; attempt++)
         {
             // 多播、组播
             // 239.0.0.0 - 239.255.255.255 本地
             // 224.0.2.0 - 238.255.255.255 用户可用，全网范围
             // 224.0.0.1 - 224.0.0.255 预留地址，最好不用
             ip =
-                $"{RandomExtension.GetInt(MinMulticastFirstByte, 238)}.{RandomExtension.GetInt(0, 255)}.{RandomExtension.GetInt(2, 255)}.{RandomExtension.GetInt(0, 255)}";
+                $"{RandomExtension.GetInt(MinMulticastFirstByte, MaxMulticastFirstByte + 1)}.{RandomExtension.GetInt(0, 256)}.{RandomExtension.GetInt(2, 256)}.{RandomExtension.GetInt(0, 256)}";
             var tempPort = startPort;
 
             var udpListeners = IPGlobalProperties.GetIPGlobalProperties().GetActiveUdpListeners();
@@ -312,8 +347,11 @@ public static class IpHelper
 
             port = tempPort;
             if (!needConnectCheck || CheckMulticastAvailability(ip, tempPort, out _)) return true;
-            needConnectCheck = false;
         }
+
+        ip = string.Empty;
+        port = 0;
+        return false;
     }
 
     private static void JoinMulticastGroupIfNeeded(UdpClient udpClient, IPAddress ipAddress)

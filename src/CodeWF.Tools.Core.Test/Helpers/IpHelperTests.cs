@@ -188,6 +188,28 @@ public class IpHelperTests
         Assert.IsType<bool>(result);
     }
 
+    [Theory]
+    [InlineData("127.0.0.1", 0)]
+    [InlineData("127.0.0.1", 65536)]
+    [InlineData("::1", 7500)]
+    public async Task CheckMulticastAvailabilityWithDetailsAsync_WithInvalidEndpoint_ShouldReject(string ip, int port)
+    {
+        var result = await IpHelper.CheckMulticastAvailabilityWithDetailsAsync(ip, port);
+
+        Assert.False(result.Success);
+        Assert.NotEmpty(result.ErrorMessage);
+    }
+
+    [Theory]
+    [InlineData(0, 7999)]
+    [InlineData(7000, 65536)]
+    [InlineData(8000, 7000)]
+    public void GetMulticastIpAndPort_WithInvalidPortRange_ShouldThrow(int startPort, int endPort)
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            IpHelper.GetMulticastIpAndPort(out _, out _, startPort, endPort));
+    }
+
     [Fact]
     public void GetMulticastIpAndPort_ShouldReturnValidIpAndPort()
     {
