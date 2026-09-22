@@ -73,7 +73,7 @@ public static class DataTableExtensions
         errorMsg = "";
         try
         {
-            MiniExcel.SaveAs(saveFilePath, dataTable, overwriteFile: overwriteFile);
+            MiniExcel.SaveAs(saveFilePath, dataTable, printHeader: containColumnHeader, overwriteFile: overwriteFile);
             return true;
         }
         catch (Exception ex)
@@ -173,18 +173,21 @@ public static class DataTableExtensions
                 throw new Exception("Can't read table columns");
             }
 
+            var targetColumnNames = new string[columnNames.Length];
             if (containColumnHeader)
             {
-                foreach (var columnName in columnNames)
+                for (var i = 0; i < columnNames.Length; i++)
                 {
-                    dataTable.Columns.Add(columnName.ToString());
+                    targetColumnNames[i] = columnNames[i];
+                    dataTable.Columns.Add(targetColumnNames[i]);
                 }
             }
             else
             {
                 for (var i = 0; i < columnNames.Length; i++)
                 {
-                    dataTable.Columns.Add(i.ToString());
+                    targetColumnNames[i] = i.ToString(CultureInfo.InvariantCulture);
+                    dataTable.Columns.Add(targetColumnNames[i]);
                 }
             }
 
@@ -197,9 +200,13 @@ public static class DataTableExtensions
                 }
 
                 var row = dataTable.NewRow();
-                foreach (var columnName in columnNames)
+                for (var columnIndex = 0; columnIndex < columnNames.Length; columnIndex++)
                 {
-                    row[columnName] = rowDatas.TryGetValue(columnName, out var val) ? val : DBNull.Value;
+                    var sourceColumnName = columnNames[columnIndex];
+                    var targetColumnName = targetColumnNames[columnIndex];
+                    row[targetColumnName] = rowDatas.TryGetValue(sourceColumnName, out var val) && val is not null
+                        ? val
+                        : DBNull.Value;
                 }
 
                 dataTable.Rows.Add(row);

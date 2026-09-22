@@ -44,6 +44,26 @@ public class ExportTest
         FileHelper.DeleteFileIfExist(file);
     }
 
+    [Fact]
+    public void Test_ExportAndImportXlsx_WithoutColumnHeader_Success()
+    {
+        var file = Path.Combine(Path.GetTempPath(), $"codewf-export-{Guid.NewGuid():N}.xlsx");
+        try
+        {
+            var data = GetData();
+            Assert.True(data.Export(file, Encoding.UTF8, out var errorMsg, containColumnHeader: false), errorMsg);
+
+            var importResult = DataTableExtensions.Import(file, out errorMsg, out var newData,
+                containColumnHeader: false);
+            Assert.True(importResult, errorMsg);
+            CheckDataWithoutHeaders(data, Assert.IsType<DataTable>(newData));
+        }
+        finally
+        {
+            FileHelper.DeleteFileIfExist(file);
+        }
+    }
+
     private DataTable GetData()
     {
         DataTable dataTable = new DataTable("SampleTable");
@@ -64,6 +84,19 @@ public class ExportTest
             Assert.Equal(oldData.Columns[i].ToString(), newData.Columns[i].ToString());
         }
 
+        for (var i = 0; i < oldData.Rows.Count; i++)
+        {
+            for (var j = 0; j < oldData.Columns.Count; j++)
+            {
+                Assert.Equal(oldData.Rows[i][j].ToString(), newData.Rows[i][j].ToString());
+            }
+        }
+    }
+
+    private void CheckDataWithoutHeaders(DataTable oldData, DataTable newData)
+    {
+        Assert.Equal(oldData.Columns.Count, newData.Columns.Count);
+        Assert.Equal(oldData.Rows.Count, newData.Rows.Count);
         for (var i = 0; i < oldData.Rows.Count; i++)
         {
             for (var j = 0; j < oldData.Columns.Count; j++)
