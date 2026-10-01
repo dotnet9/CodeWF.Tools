@@ -5,14 +5,23 @@ namespace CodeWF.Tools.Test
 {
     public class DateTimeExtensionTest
     {
-        private readonly DateTime _testDateTime = new DateTime(2024, 7, 6, 23, 12, 33, DateTimeKind.Local);
+        // GetUnixTime*/FromUnixTime* 默认按当前系统时区换算（见 DateTimeExtension 注释），
+        // 而 CI 运行在 UTC 时区，因此夹具不能硬编码某个时区的本地时刻：
+        // 先固定一个 UTC 时刻（epoch 值与时区无关），再按本机时区推导输入和期望值。
+        private static readonly DateTimeOffset TestInstantUtc =
+            new DateTimeOffset(2024, 7, 6, 15, 12, 33, TimeSpan.Zero);
 
-        private readonly DateTimeOffset _testDateTimeOffset =
-            new DateTimeOffset(2024, 7, 6, 23, 12, 33, TimeZoneInfo.Local.BaseUtcOffset);
+        private static readonly DateTime _testDateTime = TestInstantUtc.LocalDateTime;
+
+        private static readonly DateTimeOffset _testDateTimeOffset = TestInstantUtc.ToLocalTime();
 
         private const long ExpectedUnixTimeSeconds = 1720278753;
         private const int StartYear = 2024;
-        private const uint ExpectedSpecialUnixTimeSeconds = 162115530;
+
+        private static readonly uint ExpectedSpecialUnixTimeSeconds =
+            (uint)((TestInstantUtc.UtcDateTime.Ticks -
+                    new DateTimeOffset(StartYear, 1, 1, 0, 0, 0, TimeSpan.Zero).UtcDateTime.Ticks) / 1_000_000L);
+
         private const long ExpectedUnixTimeMilliseconds = 1720278753000;
 
         [Fact]
