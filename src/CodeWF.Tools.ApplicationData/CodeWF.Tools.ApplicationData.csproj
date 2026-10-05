@@ -9,6 +9,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
     <None Include="..\..\logo.png" Pack="true" PackagePath="" Link="logo.png" />
     <None Include="..\..\logo.ico" Pack="true" PackagePath="" Link="logo.ico" />
   </ItemGroup>
