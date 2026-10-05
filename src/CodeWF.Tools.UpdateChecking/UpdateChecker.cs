@@ -48,6 +48,12 @@ public sealed class UpdateChecker : IUpdateChecker
     private readonly string? _stateFile;
     private DateTime _blockedUntilUtc = DateTime.MinValue;
 
+    /// <summary>便利构造：内部创建 HttpClient（web 端点优先 + API 回退的默认配置）。</summary>
+    public UpdateChecker(string owner, string repo, Action<string>? log = null)
+        : this(new HttpClient { Timeout = TimeSpan.FromSeconds(12) }, owner, repo, log: log)
+    {
+    }
+
     public UpdateChecker(
         HttpClient http,
         string owner,
