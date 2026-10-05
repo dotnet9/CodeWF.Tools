@@ -1,6 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net10.0;net11.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
     <AssemblyName>$(AssemblyName)</AssemblyName>
     <Authors>沙漠尽头的狼</Authors>
     <ApplicationIcon>..\..\logo.ico</ApplicationIcon>
@@ -37,5 +37,7 @@
     <ProjectReference Include="..\CodeWF.Tools.Core\CodeWF.Tools.Core.csproj" />
     <ProjectReference Include="..\CodeWF.Tools.Files\CodeWF.Tools.Files.csproj" />
     <ProjectReference Include="..\CodeWF.Tools.Image\CodeWF.Tools.Image.csproj" />
+    <ProjectReference Include="..\CodeWF.Tools.UpdateChecking\CodeWF.Tools.UpdateChecking.csproj" />
+    <ProjectReference Include="..\CodeWF.Tools.ApplicationData\CodeWF.Tools.ApplicationData.csproj" />
   </ItemGroup>
 </Project>

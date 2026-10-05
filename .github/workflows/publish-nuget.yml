@@ -1,4 +1,4 @@
-name: publish-nuget
+﻿name: publish-nuget
 
 # 推送 v* 格式 tag 时触发，例如 v1.3.14.10。
 # 包版本号以 Directory.Build.props 的 <Version> 为准（打 tag 前先升版本），
@@ -60,6 +60,8 @@ jobs:
             'src/CodeWF.Tools.Core/CodeWF.Tools.Core.csproj',
             'src/CodeWF.Tools.Files/CodeWF.Tools.Files.csproj',
             'src/CodeWF.Tools.Image/CodeWF.Tools.Image.csproj',
+            'src/CodeWF.Tools.UpdateChecking/CodeWF.Tools.UpdateChecking.csproj',
+            'src/CodeWF.Tools.ApplicationData/CodeWF.Tools.ApplicationData.csproj',
             'src/CodeWF.Tools/CodeWF.Tools.csproj'
           )
 

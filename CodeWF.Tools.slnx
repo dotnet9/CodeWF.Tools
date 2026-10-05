@@ -1,4 +1,4 @@
-<Solution>
+﻿<Solution>
   <Configurations>
     <Platform Name="Any CPU" />
     <Platform Name="x64" />
@@ -22,6 +22,12 @@
     <File Path="UpdateLog.md" />
   </Folder>
 	<Project Path="src/CodeWF.Tools.Core/CodeWF.Tools.Core.csproj">
+	  <Platform Solution="*|x64" Project="x64" />
+	</Project>
+	<Project Path="src/CodeWF.Tools.UpdateChecking/CodeWF.Tools.UpdateChecking.csproj">
+	  <Platform Solution="*|x64" Project="x64" />
+	</Project>
+	<Project Path="src/CodeWF.Tools.ApplicationData/CodeWF.Tools.ApplicationData.csproj">
 	  <Platform Solution="*|x64" Project="x64" />
 	</Project>
 	<Project Path="src/CodeWF.Tools.Files/CodeWF.Tools.Files.csproj">

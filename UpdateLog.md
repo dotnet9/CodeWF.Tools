@@ -1,5 +1,14 @@
 # 更新日志
 
+## 1.3.15.0 (2026-10-04)
+
+### 新增桌面应用基础设施包
+
+- 新增 **CodeWF.Tools.UpdateChecking**：GitHub Releases 更新检查——网页端点优先（`releases/latest` 302 + `expanded_assets` 资产直链，不占 api.github.com 每小时配额），Releases API（ETag 条件请求 + 403/429 退避）自动回退；含版本比较、资产按平台选择、下载器（SHA-256 校验）。零第三方依赖。
+- 新增 **CodeWF.Tools.ApplicationData**：桌面应用数据目录标准实现——`%LOCALAPPDATA%\<应用名>` 解析、旧 Roaming 位置一次性迁移、便携模式支持、错误迁移（内容少一级目录）的散落标记检测与自动修复。
+- **CodeWF.Tools** 根包转为元包：聚合 Core / Files / Image / UpdateChecking / ApplicationData，装一个即全套。
+- 目标框架收敛：根包与两个新包 net8.0;net10.0（.NET 11 待其 AOT 工具链修复后再评估）。
+
 ## 1.3.14.9 (2026-09-22)
 
 - 🔨[修复]-修复单文件压缩生成绝对归档路径的问题，统一使用安全的相对 entry 路径。
