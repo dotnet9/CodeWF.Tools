@@ -21,4 +21,8 @@
   </ItemGroup>
 
 
+  <ItemGroup>
+    <None Include="..\..\logo.png" Pack="true" PackagePath="" Link="logo.png" />
+    <None Include="..\..\logo.ico" Pack="true" PackagePath="" Link="logo.ico" />
+  </ItemGroup>
 </Project>
