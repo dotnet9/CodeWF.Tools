@@ -1,3 +1,18 @@
+> [!WARNING]
+> # ⚠️ 本仓库已停止维护 / This repository is no longer maintained
+>
+> 本仓库已归档：不再接受 Issue 与 Pull Request，NuGet 旧包保留但不再升级。
+>
+> This repository is archived: issues and pull requests are closed, and existing NuGet packages will not receive updates.
+>
+> **替代方案 / Replacement:**
+>
+> | 旧包 / Old packages | 新包 / New packages |
+> |---|---|
+> | CodeWF.Tools(.Core/.Files/.Image/.UpdateChecking/.ApplicationData) | CodeWF.Toolkit.Core / Files / Image（更新检查与数据目录并入 Core） |
+>
+> 新仓库 / New repository: **https://github.com/dotnet9/CodeWF.Toolkit**
+
 # CodeWF.Tools
 
 | 包名 | NuGet 链接 | 下载量 |
